@@ -1,10 +1,11 @@
 package com.miro.api.widgets.testtask.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EntityRepository<Entity> {
-    Entity findEntityById(String id);
+    Optional<Entity> findEntityById(String id);
     List<Entity> findAllEntities();
-    Void saveEntity(Entity entity);
-    Boolean deleteEntityById(String id);
+    void saveEntity(Entity entity);
+    boolean deleteEntityById(String id);
 }
