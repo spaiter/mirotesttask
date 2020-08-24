@@ -9,18 +9,18 @@ import java.util.UUID;
 public class WidgetEntity {
     private String id;
     private final CoordinatePointEntity coordinatePoint;
-    private Integer zIndex;
-    private Integer height;
-    private Integer width;
-    private Instant updatedAt;
+    private int zIndex;
+    private int height;
+    private int width;
+    private long updatedAt;
 
-    public WidgetEntity(Integer xCoordinate, Integer yCoordinate, Integer zIndex, Integer height, Integer width) {
+    public WidgetEntity(int xCoordinate, int yCoordinate, int zIndex, int height, int width) {
         this.id = UUID.randomUUID().toString();
         this.coordinatePoint = new CoordinatePointEntity(xCoordinate, yCoordinate);
         this.zIndex = zIndex;
         this.height = height;
         this.width = width;
-        this.updatedAt = Instant.now();
+        this.updatedAt = Instant.now().getEpochSecond();
     }
 
     public String getId() {
@@ -31,51 +31,51 @@ public class WidgetEntity {
         this.id = id;
     }
 
-    public Integer getXCoordinate() {
+    public int getXCoordinate() {
         return this.coordinatePoint.getX();
     }
 
-    public void setXCoordinate(Integer xCoordinate) {
+    public void setXCoordinate(int xCoordinate) {
         this.coordinatePoint.setX(xCoordinate);
     }
 
-    public Integer getYCoordinate() {
+    public int getYCoordinate() {
         return this.coordinatePoint.getY();
     }
 
-    public void setYCoordinate(Integer yCoordinate) {
+    public void setYCoordinate(int yCoordinate) {
         this.coordinatePoint.setY(yCoordinate);
     }
 
-    public Integer getZIndex() {
+    public int getZIndex() {
         return zIndex;
     }
 
-    public void setZIndex(Integer zIndex) {
+    public void setZIndex(int zIndex) {
         this.zIndex = zIndex;
     }
 
-    public Integer getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public void setHeight(Integer height) {
+    public void setHeight(int height) {
         this.height = height;
     }
 
-    public Integer getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    public void setWidth(Integer width) {
+    public void setWidth(int width) {
         this.width = width;
     }
 
-    public Instant getUpdatedAt() {
+    public long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
     }
 }
