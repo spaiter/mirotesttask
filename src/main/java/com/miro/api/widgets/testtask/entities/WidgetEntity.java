@@ -7,7 +7,7 @@ import java.util.UUID;
  * Widget class, that contains all widget description.
  */
 public class WidgetEntity {
-    public String index;
+    public String id;
     public CoordinatePointEntity coordinatePoint;
     public Integer zIndex;
     public Integer height;
@@ -15,7 +15,7 @@ public class WidgetEntity {
     public Instant updatedAt;
 
     public WidgetEntity(Integer xCoordinate, Integer yCoordinate, Integer zIndex, Integer height, Integer width) {
-        this.index = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID().toString();
         this.coordinatePoint = new CoordinatePointEntity(xCoordinate, yCoordinate);
         this.zIndex = zIndex;
         this.height = height;
