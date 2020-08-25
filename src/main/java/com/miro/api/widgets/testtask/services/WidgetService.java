@@ -1,5 +1,6 @@
 package com.miro.api.widgets.testtask.services;
 
+import com.miro.api.widgets.testtask.entities.WidgetConstructorParams;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
 
 import java.util.List;
@@ -11,16 +12,12 @@ import java.util.Optional;
 public interface WidgetService {
 
     /**
-     * Allow to create widget.
-     * @param xCoordinate {@link WidgetEntity} x-coordinate, not {@code null}, can be negative.
-     * @param yCoordinate {@link WidgetEntity} y-coordinate, not {@code null}, can be negative.
-     * @param zIndex {@link WidgetEntity} z-index, can be {@code null}. If z-index is {@code null}, z-index will be set to top.
-     * @param height {@link WidgetEntity} height, not {@code null}, can't be negative.
-     * @param width {@link WidgetEntity} width, not {@code null}, can't be negative.
-     * @return {@link WidgetEntity} just created widget with specified parameters.
+     * Allow to create widget by widget constructor params object and save it.
+     * @param params {@link WidgetConstructorParams} Object with all necessary params to create widget. Not {@code null}
+     * @return just created widget with specified parameters.
      * @throws IllegalArgumentException throws if height or width params are negative.
      */
-    WidgetEntity createWidget(int xCoordinate, int yCoordinate, Integer zIndex, int height, int width) throws IllegalArgumentException;
+    WidgetEntity createAndSaveWidget(WidgetConstructorParams params) throws IllegalArgumentException;
 
     /**
      * Allow to find widget by its ID. Returns empty Optional if widget not exists, otherwise returns Optional with widget.

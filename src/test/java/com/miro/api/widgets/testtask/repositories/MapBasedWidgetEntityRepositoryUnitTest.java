@@ -1,5 +1,6 @@
 package com.miro.api.widgets.testtask.repositories;
 
+import com.miro.api.widgets.testtask.entities.WidgetConstructorParams;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
 import org.junit.jupiter.api.Test;
 
@@ -7,10 +8,18 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class MapBasedWidgetEntityRepositoryTest {
+public class MapBasedWidgetEntityRepositoryUnitTest {
+    @Test
+    public void widgetEntityRepositoryCanCreateWidget() {
+        MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
+
+        WidgetConstructorParams widgetParams = new WidgetConstructorParams(10, 20, 30, 40, 50);
+        WidgetEntity widgetEntity = widgetEntityRepository.createEntity(widgetParams);
+        assertNotNull(widgetEntity.getId());
+    }
+
     @Test
     public void widgetEntityRepositoryCanSaveWidgetAndGetSameWidgetById() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();

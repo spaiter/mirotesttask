@@ -1,11 +1,14 @@
 package com.miro.api.widgets.testtask.repositories;
 
+import com.miro.api.widgets.testtask.entities.WidgetConstructorParams;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetEntity> {
+@Repository
+public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetEntity, WidgetConstructorParams> {
     /**
      * Hash map that is store widgets ids to their indexes.
      */
@@ -59,9 +62,20 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
                 .forEach(widget -> {
                     int newWidgetZIndex = widget.getZIndex() + 1;
                     widget.setZIndex(newWidgetZIndex);
+                    widget.markUpdated();
                     widgetsStorage.put(newWidgetZIndex, widget);
                     widgetsIdsToZIndexesStorage.put(widget.getId(), newWidgetZIndex);
                 });
+    }
+
+    /**
+     * Allow to create widget entity via object with all necessary params.
+     * @param widgetConstructorParams Object with all necessary params to create widget entity.
+     * @return widget entity created by constructor params object.
+     */
+    @Override
+    public WidgetEntity createEntity(WidgetConstructorParams widgetConstructorParams) {
+        return new WidgetEntity(widgetConstructorParams);
     }
 
     /**
@@ -99,10 +113,11 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
      * @param widgetEntity {@link List<WidgetEntity>} Widget entity to save (upsert).
      */
     @Override
-    public void saveEntity(WidgetEntity widgetEntity) {
+    public WidgetEntity saveEntity(WidgetEntity widgetEntity) {
         int zIndex = widgetEntity.getZIndex();
         widgetsStorage.put(zIndex, widgetEntity);
         widgetsIdsToZIndexesStorage.put(widgetEntity.getId(), zIndex);
+        return widgetEntity;
     }
 
     /**

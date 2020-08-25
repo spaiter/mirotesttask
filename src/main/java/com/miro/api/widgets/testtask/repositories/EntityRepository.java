@@ -7,11 +7,18 @@ import java.util.Optional;
  * Common CRUD interface for any entity repository.
  * @param <Entity> Any entity for CRUD operations.
  */
-public interface EntityRepository<Entity> {
+public interface EntityRepository<Entity, EntityConstructorParams> {
+    /**
+     * Allow to create Entity from object with all necessary params.
+     * @param constructorParams Object with all params necessary to create Entity.
+     * @return Entity
+     */
+    Entity createEntity(EntityConstructorParams constructorParams);
+
     /**
      * Allow to search entity by its ID in repository.
      * @param id Entity unique ID.
-     * @return Entity by unique id if exists
+     * @return Entity by unique id if exists.
      */
     Optional<Entity> findEntityById(String id);
 
@@ -24,8 +31,9 @@ public interface EntityRepository<Entity> {
     /**
      * Allow to save (upsert) entity in repository.
      * @param entity Any entity to save.
+     * @return just saved entity.
      */
-    void saveEntity(Entity entity);
+    Entity saveEntity(Entity entity);
 
 
     /**

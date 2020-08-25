@@ -7,7 +7,7 @@ import java.util.UUID;
  * Widget class, that contains all widget description.
  */
 public class WidgetEntity {
-    private String id;
+    private final String id;
     private int xCoordinate;
     private int yCoordinate;
     private int zIndex;
@@ -25,12 +25,18 @@ public class WidgetEntity {
         this.updatedAt = Instant.now().getEpochSecond();
     }
 
-    public String getId() {
-        return id;
+    public WidgetEntity(WidgetConstructorParams widgetConstructorParams) {
+        this.id = UUID.randomUUID().toString();
+        this.xCoordinate = widgetConstructorParams.getXCoordinate();
+        this.yCoordinate = widgetConstructorParams.getYCoordinate();
+        this.zIndex = widgetConstructorParams.getZIndex();
+        this.height = widgetConstructorParams.getHeight();
+        this.width = widgetConstructorParams.getWidth();
+        this.updatedAt = Instant.now().getEpochSecond();
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getId() {
+        return id;
     }
 
     public int getXCoordinate() {
@@ -77,13 +83,14 @@ public class WidgetEntity {
         return updatedAt;
     }
 
-    public void setUpdatedAt(long updatedAt) {
-        this.updatedAt = updatedAt;
+    public void markUpdated() {
+        this.updatedAt = Instant.now().getEpochSecond();
     }
 
     @Override
     public String toString() {
         return "WidgetEntity{" +
+                "id='" + id + '\'' +
                 ", xCoordinate=" + xCoordinate +
                 ", yCoordinate=" + yCoordinate +
                 ", zIndex=" + zIndex +

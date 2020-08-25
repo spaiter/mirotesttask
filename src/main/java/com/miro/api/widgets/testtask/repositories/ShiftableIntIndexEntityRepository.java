@@ -4,7 +4,7 @@ package com.miro.api.widgets.testtask.repositories;
  * Common CRUD interface for any entity repository, where entity could be shifted by unique int index.
  * @param <Entity> Any entity for CRUD operations and shifting.
  */
-public interface ShiftableIntIndexEntityRepository<Entity> extends EntityRepository<Entity> {
+public interface ShiftableIntIndexEntityRepository<Entity, EntityConstructorParams> extends EntityRepository<Entity, EntityConstructorParams> {
     /**
      * Allow to get max entity unique int index.
      * @return max entity index.
