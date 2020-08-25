@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MapBasedWidgetEntityRepositoryTest {
     @Test
-    public void widgetEntityRepositoryShouldSaveWidgetAndGetSameWidgetById() {
+    public void widgetEntityRepositoryMustSaveWidgetAndGetSameWidgetById() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
 
         long currentTimeStamp = Instant.now().getEpochSecond();
@@ -29,7 +29,7 @@ public class MapBasedWidgetEntityRepositoryTest {
     }
 
     @Test
-    public void widgetEntityRepositoryShouldShiftWidgetsZIndexes() {
+    public void widgetEntityRepositoryMustShiftWidgetsZIndexes() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
         WidgetEntity widget1 = new WidgetEntity(0, 0, 100, 0, 0);
         WidgetEntity widget2 = new WidgetEntity(0, 0, 101, 0, 0);
@@ -59,7 +59,7 @@ public class MapBasedWidgetEntityRepositoryTest {
     }
 
     @Test
-    public void widgetEntityRepositoryShouldPutNewWidgetWithoutZIndexToTopPosition() {
+    public void widgetEntityRepositoryMustPutNewWidgetWithoutZIndexToTopPosition() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
         WidgetEntity widget1 = new WidgetEntity(0, 0, 1, 0, 0);
         WidgetEntity widget2 = new WidgetEntity(0, 0, null, 0, 0);
@@ -76,5 +76,25 @@ public class MapBasedWidgetEntityRepositoryTest {
 
         assertEquals(2, widgets.get(1).getZIndex(), "Second widget z-index must become 2");
         assertEquals(3, widgets.get(2).getZIndex(), "Second widget z-index must become 3");
+    }
+
+    @Test
+    public void widgetEntityRepositoryMustDeleteWidgetsById() {
+        MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
+        WidgetEntity widget1 = new WidgetEntity(0, 0, null, 0, 0);
+        WidgetEntity widget2 = new WidgetEntity(0, 0, null, 0, 0);
+        WidgetEntity widget3 = new WidgetEntity(0, 0, null, 0, 0);
+
+        widgetEntityRepository.saveEntity(widget1);
+        widgetEntityRepository.saveEntity(widget2);
+        widgetEntityRepository.saveEntity(widget3);
+
+        widgetEntityRepository.deleteEntityById(widget1.getId());
+        widgetEntityRepository.deleteEntityById(widget3.getId());
+
+        List<WidgetEntity> widgets = widgetEntityRepository.findAllEntities();
+
+        assertEquals(1, widgets.size(), "Widgets count must become 1");
+        assertEquals(widget2.getId(), widgets.get(0).getId(), "Last widget must be second widget");
     }
 }
