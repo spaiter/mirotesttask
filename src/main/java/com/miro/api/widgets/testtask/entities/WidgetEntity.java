@@ -8,7 +8,8 @@ import java.util.UUID;
  */
 public class WidgetEntity {
     private String id;
-    private final CoordinatePointEntity coordinatePoint;
+    private int xCoordinate;
+    private int yCoordinate;
     private Integer zIndex;
     private int height;
     private int width;
@@ -16,7 +17,8 @@ public class WidgetEntity {
 
     public WidgetEntity(int xCoordinate, int yCoordinate, Integer zIndex, int height, int width) {
         this.id = UUID.randomUUID().toString();
-        this.coordinatePoint = new CoordinatePointEntity(xCoordinate, yCoordinate);
+        this.xCoordinate = xCoordinate;
+        this.yCoordinate = yCoordinate;
         this.zIndex = zIndex;
         this.height = height;
         this.width = width;
@@ -32,19 +34,19 @@ public class WidgetEntity {
     }
 
     public int getXCoordinate() {
-        return this.coordinatePoint.getX();
+        return this.xCoordinate;
     }
 
     public void setXCoordinate(int xCoordinate) {
-        this.coordinatePoint.setX(xCoordinate);
+        this.xCoordinate = xCoordinate;
     }
 
     public int getYCoordinate() {
-        return this.coordinatePoint.getY();
+        return this.yCoordinate;
     }
 
     public void setYCoordinate(int yCoordinate) {
-        this.coordinatePoint.setY(yCoordinate);
+        this.yCoordinate = yCoordinate;
     }
 
     public Integer getZIndex() {
@@ -82,7 +84,8 @@ public class WidgetEntity {
     @Override
     public String toString() {
         return "WidgetEntity{" +
-                "id='" + id + '\'' +
+                ", xCoordinate=" + xCoordinate +
+                ", yCoordinate=" + yCoordinate +
                 ", zIndex=" + zIndex +
                 ", height=" + height +
                 ", width=" + width +
