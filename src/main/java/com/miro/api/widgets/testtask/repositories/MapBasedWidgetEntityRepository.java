@@ -3,6 +3,7 @@ package com.miro.api.widgets.testtask.repositories;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.StampedLock;
 
 public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEntity> {
@@ -14,7 +15,7 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
     /**
      * Tree map that is store widgets sorted descending by z-index.
      */
-    private final TreeMap<Integer, WidgetEntity> widgetsStorage = new TreeMap<>(Collections.reverseOrder());
+    private final ConcurrentSkipListMap<Integer, WidgetEntity> widgetsStorage = new ConcurrentSkipListMap<>(Collections.reverseOrder());
 
     /**
      * Stamped lock using for atomic concurrent read / write operations on widgetsIdsToIndexesStorage and widgetsStorage.
@@ -36,20 +37,35 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
      * @return True if widgets z-indexes needs to be shifted, else false.
      */
     private boolean isNeedToShift(int zIndex) {
-        return widgetsStorage.lastKey() <= zIndex;
+        try {
+            return widgetsStorage.firstKey() >= zIndex;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
     }
 
     /**
-     * Shifts widgets z-indexes upwards.
+     * Shifts only necessary widgets z-indexes upwards.
      * @param zIndex new widget z-index.
      */
     private void shiftUpwards(int zIndex) {
         widgetsStorage
                 .headMap(zIndex, true)
                 .values()
+                .stream()
+                .filter(widget -> {
+                    try {
+                        int currentWidgetZIndex = widget.getZIndex();
+                        int nextWidgetZIndex = widgetsStorage.higherKey(currentWidgetZIndex);
+                        return currentWidgetZIndex <= nextWidgetZIndex + 1;
+                    } catch (NullPointerException e) {
+                        return true;
+                    }
+                })
                 .forEach(widget -> {
                     int newWidgetZIndex = widget.getZIndex() + 1;
                     widget.setZIndex(newWidgetZIndex);
+                    widgetsStorage.put(newWidgetZIndex, widget);
                     widgetsIdsToIndexesStorage.put(widget.getId(), newWidgetZIndex);
                 });
     }
@@ -90,7 +106,7 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
      * @return {@link List<WidgetEntity>} All widgets in repository.
      */
     private List<WidgetEntity> findAllEntitiesWithLock() {
-        return new ArrayList<>(widgetsStorage.values());
+        return new ArrayList<>(widgetsStorage.descendingMap().values());
     }
 
     /**
@@ -122,8 +138,7 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
         long stamp = lock.writeLock();
         try {
             int zIndex = widgetEntity.getZIndex();
-            boolean needToShift = isNeedToShift(zIndex);
-            if (needToShift) {
+            if (isNeedToShift(zIndex)) {
                 shiftUpwards(zIndex);
             }
             widgetsStorage.put(zIndex, widgetEntity);
