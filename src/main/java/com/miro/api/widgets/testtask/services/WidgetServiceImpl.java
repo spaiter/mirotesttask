@@ -1,17 +1,23 @@
 package com.miro.api.widgets.testtask.services;
 
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
-import com.miro.api.widgets.testtask.repositories.EntityRepository;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
+import com.miro.api.widgets.testtask.repositories.ShiftableIntIndexEntityRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.StampedLock;
 
 /**
  * Widget service that implements all WidgetService interface contracts.
  */
 public class WidgetServiceImpl implements WidgetService {
-    private final EntityRepository<WidgetEntity> widgetsRepository;
+    private final ShiftableIntIndexEntityRepository<WidgetEntity> widgetsRepository;
+
+    /**
+     * Stamped lock using for atomic concurrent read / write operations on widgetsIdsToIndexesStorage and widgetsStorage.
+     */
+    private final StampedLock lock = new StampedLock();
 
     public WidgetServiceImpl(MapBasedWidgetEntityRepository repository) {
         widgetsRepository = repository;
@@ -29,14 +35,37 @@ public class WidgetServiceImpl implements WidgetService {
     @Override
     public WidgetEntity createWidget(int xCoordinate, int yCoordinate, Integer zIndex, int height, int width) throws IllegalArgumentException {
         checkWidthAndHeightForNegativeValue(height, width);
-        WidgetEntity widget = new WidgetEntity(xCoordinate, yCoordinate, zIndex, height, width);
-        widgetsRepository.saveEntity(widget);
-        return widget;
+        long stamp = lock.writeLock();
+        try {
+            if (zIndex != null) {
+                if (widgetsRepository.isNeedToShift(zIndex)) {
+                    widgetsRepository.shiftUpwards(zIndex);
+                }
+            } else {
+                zIndex = widgetsRepository.getMaxIndex() + 1;
+            }
+            WidgetEntity widget = new WidgetEntity(xCoordinate, yCoordinate, zIndex, height, width);
+            widgetsRepository.saveEntity(widget);
+            return widget;
+        } finally {
+            lock.unlockWrite(stamp);
+        }
     }
 
     @Override
     public Optional<WidgetEntity> getWidgetById(String id) {
-        return widgetsRepository.findEntityById(id);
+        long stamp = lock.tryOptimisticRead();
+        Optional<WidgetEntity> widget = widgetsRepository.findEntityById(id);
+
+        if(!lock.validate(stamp)) {
+            stamp = lock.readLock();
+            try {
+                return widgetsRepository.findEntityById(id);
+            } finally {
+                lock.unlock(stamp);
+            }
+        }
+        return widget;
     }
 
     @Override
@@ -55,12 +84,29 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public Boolean deleteWidgetById(String id) {
-        return widgetsRepository.deleteEntityById(id);
+    public boolean deleteWidgetById(String id) {
+        long stamp = lock.writeLock();
+        try {
+            return widgetsRepository.deleteEntityById(id);
+        } finally {
+            lock.unlockWrite(stamp);
+        }
+
     }
 
     @Override
     public List<WidgetEntity> getAllWidgets() {
-        return widgetsRepository.findAllEntities();
+        long stamp = lock.tryOptimisticRead();
+        List<WidgetEntity> widgets = widgetsRepository.findAllEntities();
+
+        if(!lock.validate(stamp)) {
+            stamp = lock.readLock();
+            try {
+                return widgetsRepository.findAllEntities();
+            } finally {
+                lock.unlock(stamp);
+            }
+        }
+        return widgets;
     }
 }

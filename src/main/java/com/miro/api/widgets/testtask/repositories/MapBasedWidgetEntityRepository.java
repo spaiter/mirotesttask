@@ -4,9 +4,8 @@ import com.miro.api.widgets.testtask.entities.WidgetEntity;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.locks.StampedLock;
 
-public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEntity> {
+public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetEntity> {
     /**
      * Hash map that is store widgets ids to their indexes.
      */
@@ -16,11 +15,6 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
      * Tree map that is store widgets sorted descending by z-index.
      */
     private final ConcurrentSkipListMap<Integer, WidgetEntity> widgetsStorage = new ConcurrentSkipListMap<>(Collections.reverseOrder());
-
-    /**
-     * Stamped lock using for atomic concurrent read / write operations on widgetsIdsToIndexesStorage and widgetsStorage.
-     */
-    private final StampedLock lock = new StampedLock();
 
     /**
      * Allow to get widget z-index by its id.
@@ -33,12 +27,12 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
 
     /**
      * Check if widgets z-indexes needs to be shifted.
-     * @param zIndex {@link WidgetEntity} Widget z-index.
+     * @param index {@link WidgetEntity} Widget z-index.
      * @return True if widgets z-indexes needs to be shifted, else false.
      */
-    private boolean isNeedToShift(int zIndex) {
+    public boolean isNeedToShift(int index) {
         try {
-            return widgetsStorage.firstKey() >= zIndex;
+            return widgetsStorage.firstKey() >= index;
         } catch (NoSuchElementException e) {
             return false;
         }
@@ -46,11 +40,11 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
 
     /**
      * Shifts only necessary widgets z-indexes upwards.
-     * @param zIndex new widget z-index.
+     * @param index new widget z-index.
      */
-    private void shiftUpwards(int zIndex) {
+    public void shiftUpwards(int index) {
         widgetsStorage
-                .headMap(zIndex, true)
+                .headMap(index, true)
                 .values()
                 .stream()
                 .filter(widget -> {
@@ -75,65 +69,24 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
      * @param id {@link WidgetEntity} Widget unique ID.
      * @return {@link WidgetEntity} Widget entity if exists.
      */
-    private Optional<WidgetEntity> findEntityByIdWithLock(String id) {
+    public Optional<WidgetEntity> findEntityById(String id) {
         Integer zIndex = this.getWidgetZIndexById(id);
         return Optional.ofNullable(widgetsStorage.get(zIndex));
-    }
-
-    /**
-     * Allow to find widget from repository by unique ID with reading lock.
-     * @param id {@link WidgetEntity} Widget unique ID.
-     * @return {@link WidgetEntity} Widget entity if exists.
-     */
-    @Override
-    public Optional<WidgetEntity> findEntityById(String id) {
-        long stamp = lock.tryOptimisticRead();
-        Optional<WidgetEntity> value = findEntityByIdWithLock(id);
-
-        if(!lock.validate(stamp)) {
-            stamp = lock.readLock();
-            try {
-                return findEntityByIdWithLock(id);
-            } finally {
-                lock.unlock(stamp);
-            }
-        }
-        return value;
     }
 
     /**
      * Allow to get all widgets in repository.
      * @return {@link List<WidgetEntity>} All widgets in repository.
      */
-    private List<WidgetEntity> findAllEntitiesWithLock() {
-        return new ArrayList<>(widgetsStorage.descendingMap().values());
-    }
-
-    /**
-     * Allow to get all widgets in repository with reading lock.
-     * @return {@link List<WidgetEntity>} All widgets in repository.
-     */
-    @Override
     public List<WidgetEntity> findAllEntities() {
-        long stamp = lock.tryOptimisticRead();
-        List<WidgetEntity> value = findAllEntitiesWithLock();
-
-        if(!lock.validate(stamp)) {
-            stamp = lock.readLock();
-            try {
-                return findAllEntitiesWithLock();
-            } finally {
-                lock.unlock(stamp);
-            }
-        }
-        return value;
+        return new ArrayList<>(widgetsStorage.descendingMap().values());
     }
 
     /**
      * Allow to get current max z-index of all widgets.
      * @return {@link WidgetEntity} max z-index.
      */
-    private int getMaxZIndex() {
+    public int getMaxIndex() {
         try {
             return widgetsStorage.firstKey();
         } catch (NoSuchElementException e) {
@@ -147,22 +100,9 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
      */
     @Override
     public void saveEntity(WidgetEntity widgetEntity) {
-        long stamp = lock.writeLock();
-        try {
-            Integer zIndex = widgetEntity.getZIndex();
-            if (zIndex != null) {
-                if (isNeedToShift(zIndex)) {
-                    shiftUpwards(zIndex);
-                }
-            } else {
-                zIndex = getMaxZIndex() + 1;
-                widgetEntity.setZIndex(zIndex);
-            }
-            widgetsStorage.put(zIndex, widgetEntity);
-            widgetsIdsToZIndexesStorage.put(widgetEntity.getId(), zIndex);
-        } finally {
-            lock.unlockWrite(stamp);
-        }
+        int zIndex = widgetEntity.getZIndex();
+        widgetsStorage.put(zIndex, widgetEntity);
+        widgetsIdsToZIndexesStorage.put(widgetEntity.getId(), zIndex);
     }
 
     /**
@@ -172,13 +112,8 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
      */
     @Override
     public boolean deleteEntityById(String id) {
-        long stamp = lock.writeLock();
-        try {
-            int zIndex = this.getWidgetZIndexById(id);
-            widgetsIdsToZIndexesStorage.remove(id);
-            return widgetsStorage.remove(zIndex) != null;
-        } finally {
-            lock.unlockWrite(stamp);
-        }
+        int zIndex = this.getWidgetZIndexById(id);
+        widgetsIdsToZIndexesStorage.remove(id);
+        return widgetsStorage.remove(zIndex) != null;
     }
 }

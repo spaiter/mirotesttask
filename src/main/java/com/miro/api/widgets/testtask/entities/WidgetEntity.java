@@ -10,12 +10,12 @@ public class WidgetEntity {
     private String id;
     private int xCoordinate;
     private int yCoordinate;
-    private Integer zIndex;
+    private int zIndex;
     private int height;
     private int width;
     private long updatedAt;
 
-    public WidgetEntity(int xCoordinate, int yCoordinate, Integer zIndex, int height, int width) {
+    public WidgetEntity(int xCoordinate, int yCoordinate, int zIndex, int height, int width) {
         this.id = UUID.randomUUID().toString();
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
@@ -49,11 +49,11 @@ public class WidgetEntity {
         this.yCoordinate = yCoordinate;
     }
 
-    public Integer getZIndex() {
+    public int getZIndex() {
         return zIndex;
     }
 
-    public void setZIndex(Integer zIndex) {
+    public void setZIndex(int zIndex) {
         this.zIndex = zIndex;
     }
 

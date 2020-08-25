@@ -46,7 +46,7 @@ public interface WidgetService {
      * @param id Allow to delete widget by its unique ID.
      * @return True if widget was deleted, false if widget with such id doesn't exist.
      */
-    Boolean deleteWidgetById(String id);
+    boolean deleteWidgetById(String id);
 
     /**
      * Allow to get all widgets, sorted ascend by z-index.

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MapBasedWidgetEntityRepositoryTest {
     @Test
-    public void widgetEntityRepositoryMustSaveWidgetAndGetSameWidgetById() {
+    public void widgetEntityRepositoryCanSaveWidgetAndGetSameWidgetById() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
 
         long currentTimeStamp = Instant.now().getEpochSecond();
@@ -29,7 +29,7 @@ public class MapBasedWidgetEntityRepositoryTest {
     }
 
     @Test
-    public void widgetEntityRepositoryMustShiftWidgetsZIndexes() {
+    public void widgetEntityRepositoryCanShiftWidgetsZIndexes() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
         WidgetEntity widget1 = new WidgetEntity(0, 0, 100, 0, 0);
         WidgetEntity widget2 = new WidgetEntity(0, 0, 101, 0, 0);
@@ -41,6 +41,7 @@ public class MapBasedWidgetEntityRepositoryTest {
         widgetEntityRepository.saveEntity(widget2);
         widgetEntityRepository.saveEntity(widget3);
         widgetEntityRepository.saveEntity(widget4);
+        widgetEntityRepository.shiftUpwards(widget5.getZIndex());
         widgetEntityRepository.saveEntity(widget5);
 
         List<WidgetEntity> widgets = widgetEntityRepository.findAllEntities();
@@ -59,31 +60,11 @@ public class MapBasedWidgetEntityRepositoryTest {
     }
 
     @Test
-    public void widgetEntityRepositoryMustPutNewWidgetWithoutZIndexToTopPosition() {
+    public void widgetEntityRepositoryCanDeleteWidgetsById() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
         WidgetEntity widget1 = new WidgetEntity(0, 0, 1, 0, 0);
-        WidgetEntity widget2 = new WidgetEntity(0, 0, null, 0, 0);
-        WidgetEntity widget3 = new WidgetEntity(0, 0, null, 0, 0);
-
-        widgetEntityRepository.saveEntity(widget1);
-        widgetEntityRepository.saveEntity(widget2);
-        widgetEntityRepository.saveEntity(widget3);
-
-        List<WidgetEntity> widgets = widgetEntityRepository.findAllEntities();
-
-        assertEquals(2, widget2.getZIndex(), "Second widget z-index must become 2");
-        assertEquals(3, widget3.getZIndex(), "Second widget z-index must become 3");
-
-        assertEquals(2, widgets.get(1).getZIndex(), "Second widget z-index must become 2");
-        assertEquals(3, widgets.get(2).getZIndex(), "Second widget z-index must become 3");
-    }
-
-    @Test
-    public void widgetEntityRepositoryMustDeleteWidgetsById() {
-        MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
-        WidgetEntity widget1 = new WidgetEntity(0, 0, null, 0, 0);
-        WidgetEntity widget2 = new WidgetEntity(0, 0, null, 0, 0);
-        WidgetEntity widget3 = new WidgetEntity(0, 0, null, 0, 0);
+        WidgetEntity widget2 = new WidgetEntity(0, 0, 2, 0, 0);
+        WidgetEntity widget3 = new WidgetEntity(0, 0, 3, 0, 0);
 
         widgetEntityRepository.saveEntity(widget1);
         widgetEntityRepository.saveEntity(widget2);
