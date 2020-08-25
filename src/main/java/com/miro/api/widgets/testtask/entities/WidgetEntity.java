@@ -78,4 +78,16 @@ public class WidgetEntity {
     public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "WidgetEntity{" +
+                "id='" + id + '\'' +
+                ", coordinatePoint=" + coordinatePoint +
+                ", zIndex=" + zIndex +
+                ", height=" + height +
+                ", width=" + width +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }
