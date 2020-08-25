@@ -10,7 +10,7 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
     /**
      * Hash map that is store widgets ids to their indexes.
      */
-    private final HashMap<String, Integer> widgetsIdsToIndexesStorage = new HashMap<>();
+    private final HashMap<String, Integer> widgetsIdsToZIndexesStorage = new HashMap<>();
 
     /**
      * Tree map that is store widgets sorted descending by z-index.
@@ -28,7 +28,7 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
      * @return Widget z-index mapped to its id.
      */
     private int getWidgetZIndexById(String id) {
-        return widgetsIdsToIndexesStorage.get(id);
+        return widgetsIdsToZIndexesStorage.get(id);
     }
 
     /**
@@ -66,7 +66,7 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
                     int newWidgetZIndex = widget.getZIndex() + 1;
                     widget.setZIndex(newWidgetZIndex);
                     widgetsStorage.put(newWidgetZIndex, widget);
-                    widgetsIdsToIndexesStorage.put(widget.getId(), newWidgetZIndex);
+                    widgetsIdsToZIndexesStorage.put(widget.getId(), newWidgetZIndex);
                 });
     }
 
@@ -130,6 +130,18 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
     }
 
     /**
+     * Allow to get current max z-index of all widgets.
+     * @return {@link WidgetEntity} max z-index.
+     */
+    private int getMaxZIndex() {
+        try {
+            return widgetsStorage.firstKey();
+        } catch (NoSuchElementException e) {
+            return 0;
+        }
+    }
+
+    /**
      * Allow to save (upsert) widget in repository with write lock.
      * @param widgetEntity {@link List<WidgetEntity>} Widget entity to save (upsert).
      */
@@ -137,12 +149,17 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
     public void saveEntity(WidgetEntity widgetEntity) {
         long stamp = lock.writeLock();
         try {
-            int zIndex = widgetEntity.getZIndex();
-            if (isNeedToShift(zIndex)) {
-                shiftUpwards(zIndex);
+            Integer zIndex = widgetEntity.getZIndex();
+            if (zIndex != null) {
+                if (isNeedToShift(zIndex)) {
+                    shiftUpwards(zIndex);
+                }
+            } else {
+                zIndex = getMaxZIndex() + 1;
+                widgetEntity.setZIndex(zIndex);
             }
             widgetsStorage.put(zIndex, widgetEntity);
-            widgetsIdsToIndexesStorage.put(widgetEntity.getId(), zIndex);
+            widgetsIdsToZIndexesStorage.put(widgetEntity.getId(), zIndex);
         } finally {
             lock.unlockWrite(stamp);
         }
@@ -158,7 +175,7 @@ public class MapBasedWidgetEntityRepository implements EntityRepository<WidgetEn
         long stamp = lock.writeLock();
         try {
             int zIndex = this.getWidgetZIndexById(id);
-            widgetsIdsToIndexesStorage.remove(id);
+            widgetsIdsToZIndexesStorage.remove(id);
             return widgetsStorage.remove(zIndex) != null;
         } finally {
             lock.unlockWrite(stamp);

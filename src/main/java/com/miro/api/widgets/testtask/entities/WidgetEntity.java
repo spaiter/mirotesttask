@@ -9,12 +9,12 @@ import java.util.UUID;
 public class WidgetEntity {
     private String id;
     private final CoordinatePointEntity coordinatePoint;
-    private int zIndex;
+    private Integer zIndex;
     private int height;
     private int width;
     private long updatedAt;
 
-    public WidgetEntity(int xCoordinate, int yCoordinate, int zIndex, int height, int width) {
+    public WidgetEntity(int xCoordinate, int yCoordinate, Integer zIndex, int height, int width) {
         this.id = UUID.randomUUID().toString();
         this.coordinatePoint = new CoordinatePointEntity(xCoordinate, yCoordinate);
         this.zIndex = zIndex;
@@ -47,11 +47,11 @@ public class WidgetEntity {
         this.coordinatePoint.setY(yCoordinate);
     }
 
-    public int getZIndex() {
+    public Integer getZIndex() {
         return zIndex;
     }
 
-    public void setZIndex(int zIndex) {
+    public void setZIndex(Integer zIndex) {
         this.zIndex = zIndex;
     }
 
@@ -83,7 +83,6 @@ public class WidgetEntity {
     public String toString() {
         return "WidgetEntity{" +
                 "id='" + id + '\'' +
-                ", coordinatePoint=" + coordinatePoint +
                 ", zIndex=" + zIndex +
                 ", height=" + height +
                 ", width=" + width +
