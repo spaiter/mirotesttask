@@ -6,7 +6,8 @@ import java.util.UUID;
 /**
  * Widget class, that contains all widget description.
  */
-public class WidgetEntity {
+
+public class WidgetEntity implements Entity {
     private final String id;
     private int xCoordinate;
     private int yCoordinate;
@@ -25,7 +26,7 @@ public class WidgetEntity {
         this.updatedAt = Instant.now().getEpochSecond();
     }
 
-    public WidgetEntity(WidgetConstructorParams widgetConstructorParams) {
+    public WidgetEntity(WidgetCreateParamsHelperEntity widgetConstructorParams) {
         this.id = UUID.randomUUID().toString();
         this.xCoordinate = widgetConstructorParams.getXCoordinate();
         this.yCoordinate = widgetConstructorParams.getYCoordinate();

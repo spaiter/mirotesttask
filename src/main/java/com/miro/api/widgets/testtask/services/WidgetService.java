@@ -1,7 +1,8 @@
 package com.miro.api.widgets.testtask.services;
 
-import com.miro.api.widgets.testtask.entities.WidgetConstructorParams;
+import com.miro.api.widgets.testtask.entities.WidgetCreateParamsHelperEntity;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import com.miro.api.widgets.testtask.entities.WidgetUpdateParamsHelperEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,11 +14,11 @@ public interface WidgetService {
 
     /**
      * Allow to create widget by widget constructor params object and save it.
-     * @param params {@link WidgetConstructorParams} Object with all necessary params to create widget. Not {@code null}
+     * @param params {@link WidgetCreateParamsHelperEntity} Object with all necessary params to create widget. Not {@code null}
      * @return just created widget with specified parameters.
      * @throws IllegalArgumentException throws if height or width params are negative.
      */
-    WidgetEntity createAndSaveWidget(WidgetConstructorParams params) throws IllegalArgumentException;
+    WidgetEntity createAndSaveWidget(WidgetCreateParamsHelperEntity params) throws IllegalArgumentException;
 
     /**
      * Allow to find widget by its ID. Returns empty Optional if widget not exists, otherwise returns Optional with widget.
@@ -29,15 +30,11 @@ public interface WidgetService {
     /**
      * Allow to update widget by its ID.
      * @param id {@link WidgetEntity} unique ID.
-     * @param xCoordinate {@link WidgetEntity} x-coordinate, not {@code null}, can be negative.
-     * @param yCoordinate {@link WidgetEntity} y-coordinate, not {@code null}, can be negative.
-     * @param zIndex {@link WidgetEntity} z-index, not {@code null}. can be negative.
-     * @param height {@link WidgetEntity} height, not {@code null}{@code null}, can't be negative.
-     * @param width {@link WidgetEntity} width, not {@code null}, can't be negative.
+     * @param updateParamsHelperEntity {@link WidgetUpdateParamsHelperEntity} Object with all necessary params to update widget. Not {@code null}
      * @return {@link WidgetEntity}
      * @throws IllegalArgumentException throws if height or width params are negative.
      */
-    Optional<WidgetEntity> updateWidgetById(String id, int xCoordinate, int yCoordinate, int zIndex, int height, int width) throws IllegalArgumentException;
+    Optional<WidgetEntity> updateWidgetById(String id, WidgetUpdateParamsHelperEntity updateParamsHelperEntity) throws IllegalArgumentException;
 
     /**
      * @param id Allow to delete widget by its unique ID.

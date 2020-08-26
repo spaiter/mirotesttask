@@ -1,29 +1,31 @@
 package com.miro.api.widgets.testtask.dto;
 
-/**
- * Widget description that will be produced to client via API response.
- */
-public class WidgetResponseDTO implements DTO {
-    private final String id;
-    private final int xCoordinate;
-    private final int yCoordinate;
-    private final int zIndex;
-    private final int height;
-    private final int width;
-    private final long updatedAt;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
-    public WidgetResponseDTO(String id, int xCoordinate, int yCoordinate, int zIndex, int height, int width, long updatedAt) {
-        this.id = id;
+public class WidgetCreateRequestDTO implements DTO {
+    @NotNull
+    private final int xCoordinate;
+
+    @NotNull
+    private final int yCoordinate;
+
+    private final Integer zIndex;
+
+    @NotNull
+    @Positive
+    private final int height;
+
+    @NotNull
+    @Positive
+    private final int width;
+
+    public WidgetCreateRequestDTO(int xCoordinate, int yCoordinate, Integer zIndex, int height, int width) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.zIndex = zIndex;
         this.height = height;
         this.width = width;
-        this.updatedAt = updatedAt;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public int getXCoordinate() {
@@ -34,7 +36,7 @@ public class WidgetResponseDTO implements DTO {
         return yCoordinate;
     }
 
-    public int getZIndex() {
+    public Integer getZIndex() {
         return zIndex;
     }
 
@@ -44,9 +46,5 @@ public class WidgetResponseDTO implements DTO {
 
     public int getWidth() {
         return width;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
     }
 }

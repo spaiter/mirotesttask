@@ -3,14 +3,14 @@ package com.miro.api.widgets.testtask.entities;
 /**
  * Class that contains all necessary params to create widget entity.
  */
-public class WidgetConstructorParams {
+public class WidgetCreateParamsHelperEntity implements Entity {
     private final int xCoordinate;
     private final int yCoordinate;
     private Integer zIndex;
     private final int height;
     private final int width;
 
-    public WidgetConstructorParams(int xCoordinate, int yCoordinate, Integer zIndex, int height, int width) {
+    public WidgetCreateParamsHelperEntity(int xCoordinate, int yCoordinate, Integer zIndex, int height, int width) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.zIndex = zIndex;

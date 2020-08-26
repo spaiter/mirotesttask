@@ -1,7 +1,7 @@
 package com.miro.api.widgets.testtask.services;
 
 
-import com.miro.api.widgets.testtask.entities.WidgetConstructorParams;
+import com.miro.api.widgets.testtask.entities.WidgetCreateParamsHelperEntity;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class WidgetServiceImplUnitTest {
 
     @Test
     public void whenCreateAndSaveWidgetByConstructorParams_thenReturnWidgetEntity() {
-        final WidgetConstructorParams widgetParams = new WidgetConstructorParams(10, 20, 30, 40, 50);
+        final WidgetCreateParamsHelperEntity widgetParams = new WidgetCreateParamsHelperEntity(10, 20, 30, 40, 50);
         final WidgetEntity widget = new WidgetEntity(10, 20, 30, 40, 50);
         given(widgetRepository.isNeedToShift(30)).willReturn(false);
         given(widgetRepository.createEntity(widgetParams)).willReturn(widget);
@@ -42,7 +42,7 @@ class WidgetServiceImplUnitTest {
 
     @Test
     public void whenCreateAndSaveWidgetByConstructorParamsWithNullZIndex_thenReturnWidgetEntityWithTopZIndex() {
-        final WidgetConstructorParams widgetParams = new WidgetConstructorParams(10, 20, 30, 40, 50);
+        final WidgetCreateParamsHelperEntity widgetParams = new WidgetCreateParamsHelperEntity(10, 20, 30, 40, 50);
         final WidgetEntity widget = new WidgetEntity(10, 20, 30, 40, 50);
         final WidgetEntity prevWidgetWithSameZIndex = new WidgetEntity(10, 20, 31, 40, 50);
 
@@ -58,7 +58,7 @@ class WidgetServiceImplUnitTest {
 
     @Test
     public void whenCreateAndSaveWidgetByConstructorParamsWithNegativeWidth_thenThrowIllegalArgumentException() {
-        final WidgetConstructorParams widgetParams = new WidgetConstructorParams(10, 20, 30, 40, -50);
+        final WidgetCreateParamsHelperEntity widgetParams = new WidgetCreateParamsHelperEntity(10, 20, 30, 40, -50);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> widgetService.createAndSaveWidget(widgetParams));
 
@@ -70,7 +70,7 @@ class WidgetServiceImplUnitTest {
 
     @Test
     public void whenCreateAndSaveWidgetByConstructorParamsWithNegativeHeight_thenThrowIllegalArgumentException() {
-        final WidgetConstructorParams widgetParams = new WidgetConstructorParams(10, 20, 30, -40, 50);
+        final WidgetCreateParamsHelperEntity widgetParams = new WidgetCreateParamsHelperEntity(10, 20, 30, -40, 50);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> widgetService.createAndSaveWidget(widgetParams));
 

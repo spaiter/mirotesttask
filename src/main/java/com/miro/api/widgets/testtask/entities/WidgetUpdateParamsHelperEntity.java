@@ -1,29 +1,21 @@
-package com.miro.api.widgets.testtask.dto;
+package com.miro.api.widgets.testtask.entities;
 
 /**
- * Widget description that will be produced to client via API response.
+ * Class that contains all necessary params to create widget entity.
  */
-public class WidgetResponseDTO implements DTO {
-    private final String id;
+public class WidgetUpdateParamsHelperEntity implements Entity {
     private final int xCoordinate;
     private final int yCoordinate;
     private final int zIndex;
     private final int height;
     private final int width;
-    private final long updatedAt;
 
-    public WidgetResponseDTO(String id, int xCoordinate, int yCoordinate, int zIndex, int height, int width, long updatedAt) {
-        this.id = id;
+    public WidgetUpdateParamsHelperEntity(int xCoordinate, int yCoordinate, int zIndex, int height, int width) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.zIndex = zIndex;
         this.height = height;
         this.width = width;
-        this.updatedAt = updatedAt;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public int getXCoordinate() {
@@ -44,9 +36,5 @@ public class WidgetResponseDTO implements DTO {
 
     public int getWidth() {
         return width;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
     }
 }

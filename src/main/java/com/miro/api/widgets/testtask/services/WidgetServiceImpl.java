@@ -1,7 +1,8 @@
 package com.miro.api.widgets.testtask.services;
 
-import com.miro.api.widgets.testtask.entities.WidgetConstructorParams;
+import com.miro.api.widgets.testtask.entities.WidgetCreateParamsHelperEntity;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import com.miro.api.widgets.testtask.entities.WidgetUpdateParamsHelperEntity;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
 import com.miro.api.widgets.testtask.repositories.ShiftableIntIndexEntityRepository;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import java.util.concurrent.locks.StampedLock;
  */
 @Service
 public class WidgetServiceImpl implements WidgetService {
-    private final ShiftableIntIndexEntityRepository<WidgetEntity, WidgetConstructorParams> widgetsRepository;
+    private final ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateParamsHelperEntity> widgetsRepository;
 
     /**
      * Stamped lock using for atomic concurrent read / write operations on widgetsIdsToIndexesStorage and widgetsStorage.
@@ -36,7 +37,7 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public WidgetEntity createAndSaveWidget(WidgetConstructorParams params) throws IllegalArgumentException {
+    public WidgetEntity createAndSaveWidget(WidgetCreateParamsHelperEntity params) throws IllegalArgumentException {
         checkWidthAndHeightForNegativeValue(params.getHeight(), params.getWidth());
         long stamp = lock.writeLock();
         try {
@@ -73,19 +74,19 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public Optional<WidgetEntity> updateWidgetById(String id, int xCoordinate, int yCoordinate, int zIndex, int height, int width) {
-        checkWidthAndHeightForNegativeValue(height, width);
+    public Optional<WidgetEntity> updateWidgetById(String id, WidgetUpdateParamsHelperEntity params) {
+        checkWidthAndHeightForNegativeValue(params.getHeight(), params.getWidth());
         long stamp = lock.writeLock();
         try {
             Optional<WidgetEntity> widget = getWidgetById(id);
             widget.map(w -> {
-                w.setXCoordinate(xCoordinate);
-                w.setYCoordinate(yCoordinate);
-                w.setZIndex(zIndex);
-                w.setHeight(height);
-                w.setWidth(width);
-                if (widgetsRepository.isNeedToShift(zIndex)) {
-                    widgetsRepository.shiftUpwards(zIndex);
+                w.setXCoordinate(params.getXCoordinate());
+                w.setYCoordinate(params.getYCoordinate());
+                w.setZIndex(params.getZIndex());
+                w.setHeight(params.getHeight());
+                w.setWidth(params.getWidth());
+                if (widgetsRepository.isNeedToShift(params.getZIndex())) {
+                    widgetsRepository.shiftUpwards(params.getZIndex());
                 }
                 widgetsRepository.saveEntity(w);
                 return w;
