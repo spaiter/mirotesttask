@@ -1,6 +1,7 @@
 package com.miro.api.widgets.testtask.repositories;
 
-import com.miro.api.widgets.testtask.entities.WidgetCreateParamsHelperEntity;
+import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
+import com.miro.api.widgets.testtask.dto.WidgetCreateRequestDTO;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +16,8 @@ public class MapBasedWidgetEntityRepositoryUnitTest {
     public void widgetEntityRepositoryCanCreateWidget() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
 
-        WidgetCreateParamsHelperEntity widgetParams = new WidgetCreateParamsHelperEntity(10, 20, 30, 40, 50);
-        WidgetEntity widgetEntity = widgetEntityRepository.createEntity(widgetParams);
+        WidgetCreateRequestDTO widgetParams = new WidgetCreateRequestDTO(10, 20, 30, 40, 50);
+        WidgetEntity widgetEntity = widgetEntityRepository.createEntity(new WidgetCreateDTO(widgetParams));
         assertNotNull(widgetEntity.getId());
     }
 

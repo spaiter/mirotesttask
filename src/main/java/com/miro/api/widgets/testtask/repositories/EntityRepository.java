@@ -7,13 +7,13 @@ import java.util.Optional;
  * Common CRUD interface for any entity repository.
  * @param <Entity> Any entity for CRUD operations.
  */
-public interface EntityRepository<Entity, EntityConstructorParams> {
+public interface EntityRepository<Entity, CreateDTO> {
     /**
      * Allow to create Entity from object with all necessary params.
-     * @param constructorParams Object with all params necessary to create Entity.
+     * @param createDTO Object with all params necessary to create Entity.
      * @return Entity
      */
-    Entity createEntity(EntityConstructorParams constructorParams);
+    Entity createEntity(CreateDTO createDTO);
 
     /**
      * Allow to search entity by its ID in repository.

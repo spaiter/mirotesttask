@@ -1,21 +1,22 @@
-package com.miro.api.widgets.testtask.entities;
+package com.miro.api.widgets.testtask.dto;
 
-/**
- * Class that contains all necessary params to create widget entity.
- */
-public class WidgetUpdateParamsHelperEntity implements Entity {
+public class WidgetUpdateDTO implements DTO {
     private final int xCoordinate;
+
     private final int yCoordinate;
+
     private final int zIndex;
+
     private final int height;
+
     private final int width;
 
-    public WidgetUpdateParamsHelperEntity(int xCoordinate, int yCoordinate, int zIndex, int height, int width) {
-        this.xCoordinate = xCoordinate;
-        this.yCoordinate = yCoordinate;
-        this.zIndex = zIndex;
-        this.height = height;
-        this.width = width;
+    public WidgetUpdateDTO(WidgetUpdateRequestDTO requestDTO) {
+        this.xCoordinate = requestDTO.getXCoordinate();
+        this.yCoordinate = requestDTO.getYCoordinate();
+        this.zIndex = requestDTO.getZIndex();
+        this.height = requestDTO.getHeight();
+        this.width = requestDTO.getWidth();
     }
 
     public int getXCoordinate() {

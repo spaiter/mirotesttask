@@ -1,5 +1,7 @@
 package com.miro.api.widgets.testtask.entities;
 
+import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -26,13 +28,13 @@ public class WidgetEntity implements Entity {
         this.updatedAt = Instant.now().getEpochSecond();
     }
 
-    public WidgetEntity(WidgetCreateParamsHelperEntity widgetConstructorParams) {
+    public WidgetEntity(WidgetCreateDTO createDTO) {
         this.id = UUID.randomUUID().toString();
-        this.xCoordinate = widgetConstructorParams.getXCoordinate();
-        this.yCoordinate = widgetConstructorParams.getYCoordinate();
-        this.zIndex = widgetConstructorParams.getZIndex();
-        this.height = widgetConstructorParams.getHeight();
-        this.width = widgetConstructorParams.getWidth();
+        this.xCoordinate = createDTO.getXCoordinate();
+        this.yCoordinate = createDTO.getYCoordinate();
+        this.zIndex = createDTO.getZIndex();
+        this.height = createDTO.getHeight();
+        this.width = createDTO.getWidth();
         this.updatedAt = Instant.now().getEpochSecond();
     }
 

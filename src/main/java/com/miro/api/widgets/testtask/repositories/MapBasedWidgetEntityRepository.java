@@ -1,6 +1,6 @@
 package com.miro.api.widgets.testtask.repositories;
 
-import com.miro.api.widgets.testtask.entities.WidgetCreateParamsHelperEntity;
+import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 @Repository
-public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateParamsHelperEntity> {
+public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateDTO> {
     /**
      * Hash map that is store widgets ids to their indexes.
      */
@@ -61,12 +61,12 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
 
     /**
      * Allow to create widget entity via object with all necessary params.
-     * @param widgetConstructorParams Object with all necessary params to create widget entity.
+     * @param createDTO Object with all necessary params to create widget entity.
      * @return widget entity created by constructor params object.
      */
     @Override
-    public WidgetEntity createEntity(WidgetCreateParamsHelperEntity widgetConstructorParams) {
-        return new WidgetEntity(widgetConstructorParams);
+    public WidgetEntity createEntity(WidgetCreateDTO createDTO) {
+        return new WidgetEntity(createDTO);
     }
 
     /**
