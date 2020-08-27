@@ -38,17 +38,60 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
     }
 
     /**
+     * Return z-index for tail position in repository for filter widgets to shift.
+     * @param index z-index to insert in repository.
+     * @return z-index shifting to.
+     */
+    private int getTailToIndex(int index) {
+        int currentListPosition;
+        int elementsCountNeedToReachCurrentValue;
+        int realElementsCount;
+        int listSize;
+        List<Integer> widgetsList;
+        widgetsList = new ArrayList<>(widgetsStorage.headMap(index, true).keySet());
+        final int realListSize = widgetsList.size();
+        listSize = widgetsList.size();
+        boolean resetCurrentValue = true;
+        Integer currentListValue = null;
+
+        while (listSize > 1) {
+            currentListPosition = listSize / 2;
+            if (currentListValue != null && currentListValue + 1 != widgetsList.get(listSize - 1)) {
+                widgetsList = widgetsList.subList(currentListPosition, currentListPosition + 1);
+                if (widgetsList.get(0) != index) {
+                    resetCurrentValue = false;
+                }
+                break;
+            }
+            currentListValue = widgetsList.get(currentListPosition);
+            if (currentListValue == index && widgetsList.get(currentListPosition - 1) != currentListValue + 1) {
+                widgetsList = widgetsList.subList(currentListPosition, currentListPosition + 1);
+                break;
+            }
+            elementsCountNeedToReachCurrentValue = currentListValue - index;
+            realElementsCount = realListSize - currentListPosition - 1;
+            if (realElementsCount >= elementsCountNeedToReachCurrentValue) {
+                widgetsList = widgetsList.subList(0, currentListPosition);
+            } else {
+                widgetsList = widgetsList.subList(currentListPosition + 1, widgetsList.size());
+            }
+            listSize = widgetsList.size();
+        }
+        if (resetCurrentValue) {
+            currentListValue = widgetsList.get(0);
+        }
+        return currentListValue;
+    }
+
+    /**
      * Shifts only necessary widgets z-indexes upwards.
      * @param index new widget z-index.
      */
     public void shiftUpwards(int index) {
-        int nextIndex = index + 1;
-        while (widgetsStorage.get(nextIndex) != null) {
-            nextIndex += 1;
-        }
+        int tailTo = getTailToIndex(index);
         widgetsStorage
                 .headMap(index, true)
-                .tailMap(nextIndex)
+                .tailMap(tailTo, true)
                 .values()
                 .forEach(widget -> {
                     int newWidgetZIndex = widget.getZIndex() + 1;
