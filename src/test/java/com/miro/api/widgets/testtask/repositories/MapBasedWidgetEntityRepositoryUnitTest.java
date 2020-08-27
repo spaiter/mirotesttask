@@ -40,32 +40,41 @@ public class MapBasedWidgetEntityRepositoryUnitTest {
     @Test
     public void widgetEntityRepositoryCanShiftWidgetsZIndexes() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
-        WidgetEntity widget1 = new WidgetEntity(0, 0, 100, 0, 0);
-        WidgetEntity widget2 = new WidgetEntity(0, 0, 101, 0, 0);
-        WidgetEntity widget3 = new WidgetEntity(0, 0, 110, 0, 0);
-        WidgetEntity widget4 = new WidgetEntity(0, 0, 120, 0, 0);
-        WidgetEntity widget5 = new WidgetEntity(0, 0, 100, 0, 0);
+        WidgetEntity widget1 = new WidgetEntity(1, 1, 100, 0, 0);
+        WidgetEntity widget2 = new WidgetEntity(2, 2, 101, 0, 0);
+        WidgetEntity widget3 = new WidgetEntity(3, 3, 110, 0, 0);
+        WidgetEntity widget4 = new WidgetEntity(4, 4, 120, 0, 0);
+        WidgetEntity widget5 = new WidgetEntity(5, 5, 100, 0, 0);
+        WidgetEntity widget6 = new WidgetEntity(6, 6, 100, 0, 0);
 
         widgetEntityRepository.saveEntity(widget1);
         widgetEntityRepository.saveEntity(widget2);
         widgetEntityRepository.saveEntity(widget3);
         widgetEntityRepository.saveEntity(widget4);
+        assertTrue(widgetEntityRepository.isNeedToShift(widget5.getZIndex()));
         widgetEntityRepository.shiftUpwards(widget5.getZIndex());
         widgetEntityRepository.saveEntity(widget5);
+        assertTrue(widgetEntityRepository.isNeedToShift(widget6.getZIndex()));
+        widgetEntityRepository.shiftUpwards(widget6.getZIndex());
+        widgetEntityRepository.saveEntity(widget6);
 
         List<WidgetEntity> widgets = widgetEntityRepository.findAllEntities();
 
-        assertEquals(5, widgets.size());
+        assertEquals(6, widgets.size());
 
         assertEquals(100, widgets.get(0).getZIndex(), "First widget z-index must become 100");
         assertEquals(101, widgets.get(1).getZIndex(), "Second widget z-index must become 101");
         assertEquals(102, widgets.get(2).getZIndex(), "Third widget z-index must become 102");
-        assertEquals(110, widgets.get(3).getZIndex(), "Fourth widget z-index must stay 110");
-        assertEquals(120, widgets.get(4).getZIndex(), "Fifth widget z-index must stay 120");
+        assertEquals(103, widgets.get(3).getZIndex(), "Fourth widget z-index must become 103");
+        assertEquals(110, widgets.get(4).getZIndex(), "Fifth widget z-index must stay 110");
+        assertEquals(120, widgets.get(5).getZIndex(), "Sixth widget z-index must stay 120");
 
-        assertEquals(widget5.getId(), widgets.get(0).getId(), "Fifth widget must stay at first position");
-        assertEquals(widget1.getId(), widgets.get(1).getId(), "First widget must shift to second position");
-        assertEquals(widget2.getId(), widgets.get(2).getId(), "Second widget must shift to third position");
+        assertEquals(widget6.getId(), widgets.get(0).getId(), "Sixth widget must stay at first position");
+        assertEquals(widget5.getId(), widgets.get(1).getId(), "Fifth widget must shift to second position");
+        assertEquals(widget1.getId(), widgets.get(2).getId(), "First widget must shift to third position");
+        assertEquals(widget2.getId(), widgets.get(3).getId(), "Second widget must shift to fourth position");
+        assertEquals(widget3.getId(), widgets.get(4).getId(), "Third widget must shift to fifth position");
+        assertEquals(widget4.getId(), widgets.get(5).getId(), "Fourth widget must shift to sixth position");
     }
 
     @Test

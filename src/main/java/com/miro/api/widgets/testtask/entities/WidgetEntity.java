@@ -8,7 +8,7 @@ import java.util.UUID;
  */
 
 public class WidgetEntity implements Entity {
-    private final String id;
+    private String id;
     private int xCoordinate;
     private int yCoordinate;
     private int zIndex;
@@ -38,6 +38,10 @@ public class WidgetEntity implements Entity {
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public int getXCoordinate() {
@@ -83,6 +87,8 @@ public class WidgetEntity implements Entity {
     public long getUpdatedAt() {
         return updatedAt;
     }
+
+    public void setUpdatedAt(long updatedAt) { this.updatedAt = updatedAt; }
 
     public void markUpdated() {
         this.updatedAt = Instant.now().getEpochSecond();

@@ -1,5 +1,7 @@
 package com.miro.api.widgets.testtask.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -29,14 +31,17 @@ public class WidgetUpdateRequestDTO implements DTO {
         this.width = width;
     }
 
+    @JsonProperty("xCoordinate")
     public int getXCoordinate() {
         return xCoordinate;
     }
 
+    @JsonProperty("yCoordinate")
     public int getYCoordinate() {
         return yCoordinate;
     }
 
+    @JsonProperty("zIndex")
     public int getZIndex() {
         return zIndex;
     }

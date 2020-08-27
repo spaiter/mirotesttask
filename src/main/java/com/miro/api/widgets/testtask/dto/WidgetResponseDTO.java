@@ -1,5 +1,7 @@
 package com.miro.api.widgets.testtask.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Widget description that will be produced to client via API response.
  */
@@ -26,14 +28,17 @@ public class WidgetResponseDTO implements DTO {
         return id;
     }
 
+    @JsonProperty("xCoordinate")
     public int getXCoordinate() {
         return xCoordinate;
     }
 
+    @JsonProperty("yCoordinate")
     public int getYCoordinate() {
         return yCoordinate;
     }
 
+    @JsonProperty("zIndex")
     public int getZIndex() {
         return zIndex;
     }

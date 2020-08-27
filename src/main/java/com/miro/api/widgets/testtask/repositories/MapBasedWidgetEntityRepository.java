@@ -34,11 +34,7 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
      * @return True if widgets z-indexes needs to be shifted, else false.
      */
     public boolean isNeedToShift(int index) {
-        try {
-            return widgetsStorage.firstKey() >= index;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+        return widgetsStorage.containsKey(index);
     }
 
     /**
@@ -46,19 +42,14 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
      * @param index new widget z-index.
      */
     public void shiftUpwards(int index) {
+        int nextIndex = index + 1;
+        while (widgetsStorage.get(nextIndex) != null) {
+            nextIndex += 1;
+        }
         widgetsStorage
                 .headMap(index, true)
+                .tailMap(nextIndex)
                 .values()
-                .stream()
-                .filter(widget -> {
-                    try {
-                        int currentWidgetZIndex = widget.getZIndex();
-                        int nextWidgetZIndex = widgetsStorage.higherKey(currentWidgetZIndex);
-                        return currentWidgetZIndex <= nextWidgetZIndex + 1;
-                    } catch (NullPointerException e) {
-                        return true;
-                    }
-                })
                 .forEach(widget -> {
                     int newWidgetZIndex = widget.getZIndex() + 1;
                     widget.setZIndex(newWidgetZIndex);
@@ -130,5 +121,14 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
         int zIndex = this.getWidgetZIndexById(id);
         widgetsIdsToZIndexesStorage.remove(id);
         return widgetsStorage.remove(zIndex) != null;
+    }
+
+    /**
+     * Allow to remove all widgets from repository.
+     */
+    @Override
+    public void purge() {
+        widgetsStorage.clear();
+        widgetsIdsToZIndexesStorage.clear();
     }
 }

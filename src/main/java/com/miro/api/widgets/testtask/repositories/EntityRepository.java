@@ -42,4 +42,10 @@ public interface EntityRepository<Entity, EntityConstructorParams> {
      * @return True if entity was found and removed successfully, else false.
      */
     boolean deleteEntityById(String id);
+
+
+    /**
+     * Allow to remove all entities from repository.
+     */
+    void purge();
 }
