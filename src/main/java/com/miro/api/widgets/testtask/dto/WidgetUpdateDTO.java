@@ -1,6 +1,6 @@
 package com.miro.api.widgets.testtask.dto;
 
-public class WidgetUpdateDTO implements DTO {
+public class WidgetUpdateDTO implements ServiceLayerDTO {
     private final int xCoordinate;
 
     private final int yCoordinate;

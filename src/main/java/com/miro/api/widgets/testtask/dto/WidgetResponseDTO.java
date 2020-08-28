@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Widget description that will be produced to client via API response.
  */
-public class WidgetResponseDTO implements DTO {
+public class WidgetResponseDTO implements AppLayerDTO {
     private final String id;
     private final int xCoordinate;
     private final int yCoordinate;

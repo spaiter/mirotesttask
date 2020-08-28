@@ -1,5 +1,6 @@
 package com.miro.api.widgets.testtask.services;
 
+import com.miro.api.widgets.testtask.dto.AppLayerDTO;
 import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
 import com.miro.api.widgets.testtask.dto.WidgetUpdateDTO;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
@@ -10,7 +11,7 @@ import java.util.Optional;
 /**
  * Common widget service interface with all business logic. Allows to manage widgets by providing CRUD operations using widgets.
  */
-public interface WidgetService<Response> {
+public interface WidgetService<Response extends AppLayerDTO> {
 
     /**
      * Allow to create widget by widget constructor params object and save it.

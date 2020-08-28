@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-public class WidgetUpdateRequestDTO implements DTO {
+public class WidgetUpdateRequestDTO implements AppLayerDTO {
     @NotNull
     private final int xCoordinate;
 

@@ -1,5 +1,7 @@
 package com.miro.api.widgets.testtask.repositories;
 
+import com.miro.api.widgets.testtask.dto.ServiceLayerDTO;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -7,7 +9,7 @@ import java.util.Optional;
  * Common CRUD interface for any entity repository.
  * @param <Entity> Any entity for CRUD operations.
  */
-public interface EntityRepository<Entity, CreateDTO> {
+public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO> {
     /**
      * Allow to create Entity from object with all necessary params.
      * @param createDTO Object with all params necessary to create Entity.
