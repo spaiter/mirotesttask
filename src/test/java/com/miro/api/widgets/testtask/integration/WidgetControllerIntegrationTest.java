@@ -84,6 +84,66 @@ public class WidgetControllerIntegrationTest {
     }
 
     @Test
+    public void whenPostRequestsToWidgetsWithNegativeZIndex_thenCorrectResponse() throws Exception {
+        List<WidgetResponseDTO> requests = List.of(
+                new WidgetCreateRequestDTO(0, 0, -10, 1, 1),
+                new WidgetCreateRequestDTO(1, 1, -20, 2, 2),
+                new WidgetCreateRequestDTO(1, 1, -20, 2, 2),
+                new WidgetCreateRequestDTO(2, 2, 30, 3, 3)
+        ).stream().map(request -> {
+            try {
+                return objectMapper.writeValueAsString(request);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(json -> {
+            try {
+                return mockMvc.perform(MockMvcRequestBuilders.post("/widgets")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isCreated())
+                        .andReturn();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(response -> {
+            try {
+                return response.getResponse().getContentAsString();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(result -> {
+            try {
+                return objectMapper.readValue(result, WidgetResponseDTO.class);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/widgets")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String actualResponseBody = result.getResponse().getContentAsString();
+        WidgetResponseDTO[] responseDTO = objectMapper.readValue(actualResponseBody, WidgetResponseDTO[].class);
+        List<WidgetResponseDTO> widgets = Arrays.asList(responseDTO);
+
+        assertThat(widgets.size()).isEqualTo(requests.size());
+
+        assertThat(widgets.get(0).getId()).isEqualTo(requests.get(2).getId());
+        assertThat(widgets.get(0).getZIndex()).isEqualTo(-20);
+        assertThat(widgets.get(1).getId()).isEqualTo(requests.get(1).getId());
+        assertThat(widgets.get(1).getZIndex()).isEqualTo(-19);
+        assertThat(widgets.get(2).getId()).isEqualTo(requests.get(0).getId());
+        assertThat(widgets.get(3).getId()).isEqualTo(requests.get(3).getId());
+    }
+
+    @Test
     public void whenManyPostRequestToWidgetsAndValidWidgets_thenCorrectResponse() throws Exception {
         WidgetCreateRequestDTO request = new WidgetCreateRequestDTO(10, 20, 30, 40, 50);
         String jsonRequest = objectMapper.writeValueAsString(request);
