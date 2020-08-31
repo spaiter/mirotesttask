@@ -1,11 +1,13 @@
 package com.miro.api.widgets.testtask.services;
 
 import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
+import com.miro.api.widgets.testtask.dto.WidgetFilterDTO;
 import com.miro.api.widgets.testtask.dto.WidgetResponseDTO;
 import com.miro.api.widgets.testtask.dto.WidgetUpdateDTO;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
 import com.miro.api.widgets.testtask.repositories.ShiftableIntIndexEntityRepository;
+import com.miro.api.widgets.testtask.utils.PageHelperWrapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
 
-    private final ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateDTO> widgetsRepository;
+    private final ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateDTO, WidgetFilterDTO> widgetsRepository;
 
     /**
      * Stamped lock using for atomic concurrent read / write operations on widgetsIdsToIndexesStorage and widgetsStorage.
@@ -98,16 +100,19 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
         try {
             Optional<WidgetEntity> widget = widgetsRepository.findEntityById(id);
             widget.map(w -> {
-                w.setXCoordinate(updateDTO.getXCoordinate());
-                w.setYCoordinate(updateDTO.getYCoordinate());
-                w.setZIndex(updateDTO.getZIndex());
-                w.setHeight(updateDTO.getHeight());
-                w.setWidth(updateDTO.getWidth());
-                if (widgetsRepository.isNeedToShift(updateDTO.getZIndex())) {
+                WidgetEntity widgetEntity = new WidgetEntity(
+                        updateDTO.getXCoordinate(),
+                        updateDTO.getYCoordinate(),
+                        updateDTO.getZIndex(),
+                        updateDTO.getHeight(),
+                        updateDTO.getWidth()
+                );
+                widgetEntity.setId(w.getId());
+                if (widgetsRepository.isNeedToShift(updateDTO.getZIndex(), w.getId())) {
                     widgetsRepository.shiftUpwards(updateDTO.getZIndex());
                 }
-                widgetsRepository.saveEntity(w);
-                return w;
+                widgetsRepository.saveEntity(widgetEntity);
+                return widgetEntity;
             });
             return widget.map(this::convertWidgetEntityToWidgetResponseDTO);
         } finally {
@@ -156,28 +161,66 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
         int page = pageRequest.getPageNumber();
         int size = pageRequest.getPageSize();
 
-        List<WidgetEntity> widgets = widgetsRepository.findAllEntities(page, size);
+        PageHelperWrapper<WidgetEntity> widgets = widgetsRepository.findAllEntities(page, size);
 
         if(!lock.validate(stamp)) {
             stamp = lock.readLock();
             try {
-                int widgetsCount = widgetsRepository.getCount();
-                List<WidgetResponseDTO> widgetResponses = widgetsRepository
-                        .findAllEntities(page, size)
+                widgets = widgetsRepository.findAllEntities(page, size);
+                List<WidgetResponseDTO> widgetResponses = widgets
+                        .getData()
                         .stream()
                         .map(this::convertWidgetEntityToWidgetResponseDTO)
                         .collect(Collectors.toList());
-                return new PageImpl<>(widgetResponses, pageRequest, widgetsCount);
+                return new PageImpl<>(widgetResponses, pageRequest, widgets.getCount());
             } finally {
                 lock.unlock(stamp);
             }
         }
 
-        int widgetsCount = widgetsRepository.getCount();
         List<WidgetResponseDTO> widgetResponses = widgets
+                .getData()
                 .stream()
                 .map(this::convertWidgetEntityToWidgetResponseDTO)
                 .collect(Collectors.toList());
-        return new PageImpl<>(widgetResponses, pageRequest, widgetsCount);
+        return new PageImpl<>(widgetResponses, pageRequest, widgets.getCount());
+    }
+
+    /**
+     * Allow to get filtered widgets with pagination, sorted ascend by z-index.
+     * @param pageRequest {@link Pageable} any object that implements Pageable interface.
+     * @param filterDTO   DTO {@link WidgetFilterDTO} with filtering properties.
+     * @return {@link Page<WidgetResponseDTO>}
+     */
+    @Override
+    public Page<WidgetResponseDTO> getFilteredWidgets(Pageable pageRequest, WidgetFilterDTO filterDTO) {
+        long stamp = lock.tryOptimisticRead();
+
+        int page = pageRequest.getPageNumber();
+        int size = pageRequest.getPageSize();
+
+        PageHelperWrapper<WidgetEntity> widgets = widgetsRepository.getFilteredEntities(page, size, filterDTO);
+
+        if(!lock.validate(stamp)) {
+            stamp = lock.readLock();
+            try {
+                widgets = widgetsRepository.getFilteredEntities(page, size, filterDTO);
+                List<WidgetResponseDTO> widgetResponses = widgets
+                        .getData()
+                        .stream()
+                        .map(this::convertWidgetEntityToWidgetResponseDTO)
+                        .collect(Collectors.toList());
+                return new PageImpl<>(widgetResponses, pageRequest, widgets.getCount());
+            } finally {
+                lock.unlock(stamp);
+            }
+        }
+
+        List<WidgetResponseDTO> widgetResponses = widgets
+                .getData()
+                .stream()
+                .map(this::convertWidgetEntityToWidgetResponseDTO)
+                .collect(Collectors.toList());
+        return new PageImpl<>(widgetResponses, pageRequest, widgets.getCount());
     }
 }

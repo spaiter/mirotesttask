@@ -5,14 +5,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.miro.api.widgets.testtask.dto.WidgetCreateRequestDTO;
 import com.miro.api.widgets.testtask.dto.WidgetResponseDTO;
+import com.miro.api.widgets.testtask.dto.WidgetUpdateRequestDTO;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
 import com.miro.api.widgets.testtask.exceptions.ErrorResponse;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
 import com.miro.api.widgets.testtask.utils.PageObjectMapperModule;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,6 +48,7 @@ public class WidgetControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @AfterEach
+    @BeforeEach
     private void purgeRepo() {
         repository.purge();
     }
@@ -328,6 +327,149 @@ public class WidgetControllerIntegrationTest {
 
         assertThat(validationError.getDetails().get(0)).isEqualTo("page - must be greater than or equal to 0");
         assertThat(validationError.getDetails().get(1)).isEqualTo("size - must be less than or equal to 500");
+    }
+
+    @Test
+    public void whenGetFilteredRequests_thenCorrectResponse() throws Exception {
+        List<WidgetResponseDTO> requests = List.of(
+                new WidgetCreateRequestDTO(-3, -4, 1, 3, 2),
+                new WidgetCreateRequestDTO(-2, 1, 2, 1, 1),
+                new WidgetCreateRequestDTO(-3, 0, 3, 5, 3),
+                new WidgetCreateRequestDTO(1, 1, 4, 2, 2),
+                new WidgetCreateRequestDTO(2, -1, 5, 2, 3)
+        ).stream().map(request -> {
+            try {
+                return objectMapper.writeValueAsString(request);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(json -> {
+            try {
+                return mockMvc.perform(MockMvcRequestBuilders.post("/widgets")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isCreated())
+                        .andReturn();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(response -> {
+            try {
+                return response.getResponse().getContentAsString();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(result -> {
+            try {
+                return objectMapper.readValue(result, WidgetResponseDTO.class);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/widgets")
+                .queryParam("page", "0")
+                .queryParam("size", "10")
+                .queryParam("x1", "-4")
+                .queryParam("y1", "-4")
+                .queryParam("x2", "3")
+                .queryParam("y2", "4")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String actualResponseBody = result.getResponse().getContentAsString();
+        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        List<WidgetResponseDTO> widgets = responseDTO.getContent();
+
+        assertThat(widgets.size()).isEqualTo(3);
+
+        assertThat(widgets.get(0).getId()).isEqualTo(requests.get(0).getId());
+        assertThat(widgets.get(1).getId()).isEqualTo(requests.get(1).getId());
+        assertThat(widgets.get(2).getId()).isEqualTo(requests.get(3).getId());
+    }
+
+    @Test
+    public void whenGetFilteredRequestsAfterUpdateRequest_thenCorrectResponse() throws Exception {
+        List<WidgetResponseDTO> requests = List.of(
+                new WidgetCreateRequestDTO(-3, -4, -5, 3, 2),
+                new WidgetCreateRequestDTO(-2, 1, 2, 1, 1),
+                new WidgetCreateRequestDTO(-3, 0, 3, 5, 3),
+                new WidgetCreateRequestDTO(1, 1, 4, 2, 2),
+                new WidgetCreateRequestDTO(2, -1, 5, 2, 3)
+        ).stream().map(request -> {
+            try {
+                return objectMapper.writeValueAsString(request);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(json -> {
+            try {
+                return mockMvc.perform(MockMvcRequestBuilders.post("/widgets")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isCreated())
+                        .andReturn();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(response -> {
+            try {
+                return response.getResponse().getContentAsString();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(result -> {
+            try {
+                return objectMapper.readValue(result, WidgetResponseDTO.class);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        WidgetResponseDTO widget1 = requests.get(0);
+
+        WidgetUpdateRequestDTO widgetUpdateRequestDTO = new WidgetUpdateRequestDTO(
+                widget1.getXCoordinate(),
+                widget1.getYCoordinate(),
+                widget1.getZIndex(),
+                10,
+                widget1.getWidth()
+        );
+        String jsonUpdateRequest = objectMapper.writeValueAsString(widgetUpdateRequestDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.put(String.format("/widgets/%s", widget1.getId()))
+                .content(jsonUpdateRequest)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/widgets")
+                .queryParam("page", "0")
+                .queryParam("size", "10")
+                .queryParam("x1", "-4")
+                .queryParam("y1", "-4")
+                .queryParam("x2", "3")
+                .queryParam("y2", "4")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String actualResponseBody = result.getResponse().getContentAsString();
+        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        List<WidgetResponseDTO> widgets = responseDTO.getContent();
+
+        assertThat(widgets.size()).isEqualTo(2);
+
+        assertThat(widgets.get(0).getId()).isEqualTo(requests.get(1).getId());
+        assertThat(widgets.get(1).getId()).isEqualTo(requests.get(3).getId());
     }
 
 }

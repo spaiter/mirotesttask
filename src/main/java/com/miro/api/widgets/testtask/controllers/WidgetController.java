@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
@@ -38,6 +39,20 @@ public class WidgetController {
     ) {
         Pageable pageRequest = PageRequest.of(page, size);
         return new ResponseEntity<>(widgetService.getAllWidgets(pageRequest), HttpStatus.OK);
+    }
+
+    @GetMapping(params = { "page", "size", "x1", "y1", "x2", "y2" })
+    public ResponseEntity<Page<WidgetResponseDTO>> getFilteredWidgets(
+            @RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
+            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(500) Integer size,
+            @RequestParam(value = "x1") @NotNull Integer x1,
+            @RequestParam(value = "y1") @NotNull Integer y1,
+            @RequestParam(value = "x2") @NotNull Integer x2,
+            @RequestParam(value = "y2") @NotNull Integer y2
+    ) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        WidgetFilterDTO filter = new WidgetFilterDTO(x1, y1, x2, y2);
+        return new ResponseEntity<>(widgetService.getFilteredWidgets(pageRequest, filter), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{widgetId}")

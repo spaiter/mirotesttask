@@ -2,6 +2,7 @@ package com.miro.api.widgets.testtask.services;
 
 import com.miro.api.widgets.testtask.dto.AppLayerDTO;
 import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
+import com.miro.api.widgets.testtask.dto.WidgetFilterDTO;
 import com.miro.api.widgets.testtask.dto.WidgetUpdateDTO;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
 import org.springframework.data.domain.Page;
@@ -58,4 +59,12 @@ public interface WidgetService<Response extends AppLayerDTO> {
      * @return {@link Page<Response>}
      */
     Page<Response> getAllWidgets(Pageable pageRequest);
+
+    /**
+     * Allow to get filtered widgets with pagination, sorted ascend by z-index.
+     * @param pageRequest {@link Pageable} any object that implements Pageable interface.
+     * @param filterDTO DTO {@link WidgetFilterDTO} with filtering properties.
+     * @return {@link Page<Response>}
+     */
+    Page<Response> getFilteredWidgets(Pageable pageRequest, WidgetFilterDTO filterDTO);
 }

@@ -1,6 +1,7 @@
 package com.miro.api.widgets.testtask.repositories;
 
 import com.miro.api.widgets.testtask.dto.ServiceLayerDTO;
+import com.miro.api.widgets.testtask.utils.PageHelperWrapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +10,7 @@ import java.util.Optional;
  * Common CRUD interface for any entity repository.
  * @param <Entity> Any entity for CRUD operations.
  */
-public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO> {
+public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO, FilterDTO extends ServiceLayerDTO> {
     /**
      * Allow to create Entity from object with all necessary params.
      * @param createDTO Object with all params necessary to create Entity.
@@ -36,7 +37,7 @@ public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO> {
      * @param size Number of entities in page. Min value is 1.
      * @return List of entities on page.
      */
-    List<Entity> findAllEntities(int page, int size);
+    PageHelperWrapper<Entity> findAllEntities(int page, int size);
 
     /**
      * Allow to save (upsert) entity in repository.
@@ -65,4 +66,13 @@ public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO> {
      * @return count of all entities.
      */
     int getCount();
+
+    /**
+     * Allow to get filtered entities from repository by page.
+     * @param page Page of entities you want to get. Min value is 0.
+     * @param size Number of entities in page. Min value is 1.
+     * @param filter Object with filter properties.
+     * @return List of filtered entities on page.
+     */
+    PageHelperWrapper<Entity> getFilteredEntities(int page, int size, FilterDTO filter);
 }

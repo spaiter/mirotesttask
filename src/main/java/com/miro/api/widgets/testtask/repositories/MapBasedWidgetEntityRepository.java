@@ -1,7 +1,9 @@
 package com.miro.api.widgets.testtask.repositories;
 
 import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
+import com.miro.api.widgets.testtask.dto.WidgetFilterDTO;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import com.miro.api.widgets.testtask.utils.PageHelperWrapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -9,11 +11,77 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 @Repository
-public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateDTO> {
+public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateDTO, WidgetFilterDTO> {
     /**
      * Hash map that is store widgets ids to their indexes.
      */
     private final HashMap<String, Integer> widgetsIdsToZIndexesStorage = new HashMap<>();
+
+    /**
+     * Tree map that is store widget x-coordinate search index.
+     */
+    private final TreeMap<Integer, Set<Integer>> x1CoordinateSearchIndex = new TreeMap<>();
+
+    /**
+     * Tree map that is store widget y-coordinate search index.
+     */
+    private final TreeMap<Integer, Set<Integer>> y1CoordinateSearchIndex = new TreeMap<>();
+
+    /**
+     * Tree map that is store widget x-coordinate + widget width search index.
+     */
+    private final TreeMap<Integer, Set<Integer>> x2CoordinateSearchIndex = new TreeMap<>();
+
+    /**
+     * Tree map that is store widget y-coordinate + widget height search index.
+     */
+    private final TreeMap<Integer, Set<Integer>> y2CoordinateSearchIndex = new TreeMap<>();
+
+    private void removeWidgetFromSearchIndex(TreeMap<Integer, Set<Integer>> searchIndex, int key, int zIndex) {
+        Set<Integer> zIndexes = searchIndex.get(key);
+        if (zIndexes != null) {
+            zIndexes.remove(zIndex);
+            if (zIndexes.isEmpty()) {
+                searchIndex.remove(key);
+            }
+        }
+    }
+
+    private void addWidgetToSearchIndex(TreeMap<Integer, Set<Integer>> searchIndex, int key, int zIndex) {
+        Set<Integer> zIndexes = searchIndex.get(key);
+        if (zIndexes == null) {
+            HashSet<Integer> set = new HashSet<>();
+            set.add(zIndex);
+            searchIndex.put(key, set);
+        } else {
+            zIndexes.add(zIndex);
+        }
+    }
+
+    private void setFilteringIndexes(WidgetEntity oldWidget, WidgetEntity newWidget) {
+        if (oldWidget != null) {
+            int zIndex = oldWidget.getZIndex();
+            int x1 =  oldWidget.getXCoordinate();
+            int y1 = oldWidget.getYCoordinate();
+            int x2 = x1 + oldWidget.getWidth();
+            int y2 = y1 + oldWidget.getHeight();
+            removeWidgetFromSearchIndex(x1CoordinateSearchIndex, x1, zIndex);
+            removeWidgetFromSearchIndex(y1CoordinateSearchIndex, y1, zIndex);
+            removeWidgetFromSearchIndex(x2CoordinateSearchIndex, x2, zIndex);
+            removeWidgetFromSearchIndex(y2CoordinateSearchIndex, y2, zIndex);
+        }
+
+        int zIndex = newWidget.getZIndex();
+        int x1 =  newWidget.getXCoordinate();
+        int y1 = newWidget.getYCoordinate();
+        int x2 = x1 + newWidget.getWidth();
+        int y2 = y1 + newWidget.getHeight();
+
+        addWidgetToSearchIndex(x1CoordinateSearchIndex, x1, zIndex);
+        addWidgetToSearchIndex(y1CoordinateSearchIndex, y1, zIndex);
+        addWidgetToSearchIndex(x2CoordinateSearchIndex, x2, zIndex);
+        addWidgetToSearchIndex(y2CoordinateSearchIndex, y2, zIndex);
+    }
 
     /**
      * Tree map that is store widgets sorted descending by z-index.
@@ -30,12 +98,27 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
     }
 
     /**
-     * Check if widgets z-indexes needs to be shifted.
+     * Check if widgets z-indexes needs to be shifted. Use on create.
      * @param index {@link WidgetEntity} Widget z-index.
      * @return True if widgets z-indexes needs to be shifted, else false.
      */
     public boolean isNeedToShift(int index) {
         return widgetsStorage.containsKey(index);
+    }
+
+    /**
+     * Check if widgets z-indexes needs to be shifted. Use on update.
+     * We need to shift widgets only if widget with such z-index has same id, so it is widget update with same z-index.
+     * @param zIndex {@link WidgetEntity} Widget z-index.
+     * @param id {@link WidgetEntity} Widget id.
+     * @return True if widgets z-indexes needs to be shifted, else false.
+     */
+    public boolean isNeedToShift(int zIndex, String id) {
+        if (!widgetsStorage.containsKey(zIndex)) {
+            return false;
+        }
+        WidgetEntity widget = widgetsStorage.get(zIndex);
+        return !widget.getId().equals(id);
     }
 
     /**
@@ -137,14 +220,16 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
      * @param size Number of widgets in page. Min value is 1.
      * @return {@link List<WidgetEntity>} Widgets in repository on page.
      */
-    public List<WidgetEntity> findAllEntities(int page, int size) {
-        return widgetsStorage
+    public PageHelperWrapper<WidgetEntity> findAllEntities(int page, int size) {
+        List<WidgetEntity> widgets = widgetsStorage
                 .descendingMap()
                 .values()
                 .stream()
                 .skip(page * size)
                 .limit(size)
                 .collect(Collectors.toList());
+        int count = widgetsStorage.size();
+        return new PageHelperWrapper<>(widgets, count);
     }
 
     /**
@@ -166,6 +251,8 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
     @Override
     public WidgetEntity saveEntity(WidgetEntity widgetEntity) {
         int zIndex = widgetEntity.getZIndex();
+        WidgetEntity oldWidgetEntity = widgetsStorage.get(zIndex);
+        setFilteringIndexes(oldWidgetEntity, widgetEntity);
         widgetsStorage.put(zIndex, widgetEntity);
         widgetsIdsToZIndexesStorage.put(widgetEntity.getId(), zIndex);
         return widgetEntity;
@@ -190,6 +277,10 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
     public void purge() {
         widgetsStorage.clear();
         widgetsIdsToZIndexesStorage.clear();
+        x1CoordinateSearchIndex.clear();
+        y1CoordinateSearchIndex.clear();
+        x2CoordinateSearchIndex.clear();
+        y2CoordinateSearchIndex.clear();
     }
 
     /**
@@ -199,5 +290,53 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
     @Override
     public int getCount() {
         return widgetsStorage.size();
+    }
+
+    /**
+     * Allow to get all widgets z-indexes suitable for current search index.
+     * @param searchIndex One of four search indexes.
+     * @param filter Filtering value for search index.
+     * @param gte If true, then search only in higher (inclusive) elements, else only lower (inclusive) elements.
+     * @return Set of widgets z-indexes in current search index suitable for current filter.
+     */
+    private Set<Integer> getSearchIndexSetOfZIndexes(TreeMap<Integer, Set<Integer>> searchIndex, int filter, boolean gte) {
+        NavigableMap<Integer, Set<Integer>> map = gte
+                ? searchIndex.tailMap(filter, true)
+                : searchIndex.headMap(filter, true);
+        return map
+                .values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Allow to get filtered widgets from repository by page.
+     *
+     * @param page   Page of widgets you want to get. Min value is 0.
+     * @param size   Number of widgets in page. Min value is 1.
+     * @param filter Object with filter properties.
+     * @return List of filtered widgets on page.
+     */
+    @Override
+    public PageHelperWrapper<WidgetEntity> getFilteredEntities(int page, int size, WidgetFilterDTO filter) {
+        Set<Integer> x1Match = getSearchIndexSetOfZIndexes(x1CoordinateSearchIndex, filter.getX1(), true);
+        Set<Integer> y1Match = getSearchIndexSetOfZIndexes(y1CoordinateSearchIndex, filter.getY1(), true);
+        Set<Integer> x2Match = getSearchIndexSetOfZIndexes(x2CoordinateSearchIndex, filter.getX2(), false);
+        Set<Integer> y2Match = getSearchIndexSetOfZIndexes(y2CoordinateSearchIndex, filter.getY2(), false);
+
+        x1Match.retainAll(y1Match);
+        x1Match.retainAll(x2Match);
+        x1Match.retainAll(y2Match);
+
+        List<WidgetEntity> widgets = x1Match
+                .stream()
+                .sorted()
+                .skip(page * size)
+                .limit(size)
+                .map(widgetsStorage::get)
+                .collect(Collectors.toList());
+
+        return new PageHelperWrapper<>(widgets, x1Match.size());
     }
 }
