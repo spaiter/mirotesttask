@@ -551,4 +551,67 @@ public class WidgetControllerIntegrationTest {
         assertThat(filteredWidgets.get(3).getId()).isEqualTo(allWidgets.get(4).getId());
     }
 
+
+    @Test
+    public void whenGetFilteredRequestsAfterWidgetDeleteRequest_thenCorrectResponse() throws Exception {
+        List<WidgetResponseDTO> requests = List.of(
+                new WidgetCreateRequestDTO(0, 0, 1, 1, 1),
+                new WidgetCreateRequestDTO(1, 1, 2, 1, 1),
+                new WidgetCreateRequestDTO(2, 2, 3, 1, 1)
+        ).stream().map(request -> {
+            try {
+                return objectMapper.writeValueAsString(request);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(json -> {
+            try {
+                return mockMvc.perform(MockMvcRequestBuilders.post("/widgets")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isCreated())
+                        .andReturn();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(response -> {
+            try {
+                return response.getResponse().getContentAsString();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(result -> {
+            try {
+                return objectMapper.readValue(result, WidgetResponseDTO.class);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(String.format("/widgets/%s", requests.get(1).getId()))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/widgets")
+                .queryParam("page", "0")
+                .queryParam("size", "10")
+                .queryParam("x1", "0")
+                .queryParam("y1", "0")
+                .queryParam("x2", "3")
+                .queryParam("y2", "3")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String actualResponseBody = result.getResponse().getContentAsString();
+        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        List<WidgetResponseDTO> filteredWidgets = responseDTO.getContent();
+
+        assertThat(filteredWidgets.size()).isEqualTo(2);
+    }
+
 }

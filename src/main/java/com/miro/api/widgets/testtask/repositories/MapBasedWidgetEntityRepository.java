@@ -300,6 +300,8 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
     @Override
     public boolean deleteEntityById(String id) {
         int zIndex = this.getWidgetZIndexById(id);
+        WidgetEntity widget = widgetsStorage.get(zIndex);
+        removeWidgetFromSearchIndexes(widget);
         widgetsIdsToZIndexesStorage.remove(id);
         return widgetsStorage.remove(zIndex) != null;
     }
