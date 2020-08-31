@@ -37,6 +37,12 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
      */
     private final TreeMap<Integer, Set<Integer>> y2CoordinateSearchIndex = new TreeMap<>();
 
+    /**
+     * Allow to remove widget from search index.
+     * @param searchIndex One of search indexes.
+     * @param key Key of search index.
+     * @param zIndex {@link WidgetEntity} z-index.
+     */
     private void removeWidgetFromSearchIndex(TreeMap<Integer, Set<Integer>> searchIndex, int key, int zIndex) {
         Set<Integer> zIndexes = searchIndex.get(key);
         if (zIndexes != null) {
@@ -47,6 +53,12 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
         }
     }
 
+    /**
+     * Allow to add widget to search index.
+     * @param searchIndex One of search indexes.
+     * @param key Key of search index.
+     * @param zIndex {@link WidgetEntity} z-index.
+     */
     private void addWidgetToSearchIndex(TreeMap<Integer, Set<Integer>> searchIndex, int key, int zIndex) {
         Set<Integer> zIndexes = searchIndex.get(key);
         if (zIndexes == null) {
@@ -58,29 +70,50 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
         }
     }
 
-    private void setFilteringIndexes(WidgetEntity oldWidget, WidgetEntity newWidget) {
-        if (oldWidget != null) {
-            int zIndex = oldWidget.getZIndex();
-            int x1 =  oldWidget.getXCoordinate();
-            int y1 = oldWidget.getYCoordinate();
-            int x2 = x1 + oldWidget.getWidth();
-            int y2 = y1 + oldWidget.getHeight();
-            removeWidgetFromSearchIndex(x1CoordinateSearchIndex, x1, zIndex);
-            removeWidgetFromSearchIndex(y1CoordinateSearchIndex, y1, zIndex);
-            removeWidgetFromSearchIndex(x2CoordinateSearchIndex, x2, zIndex);
-            removeWidgetFromSearchIndex(y2CoordinateSearchIndex, y2, zIndex);
-        }
-
-        int zIndex = newWidget.getZIndex();
-        int x1 =  newWidget.getXCoordinate();
-        int y1 = newWidget.getYCoordinate();
-        int x2 = x1 + newWidget.getWidth();
-        int y2 = y1 + newWidget.getHeight();
+    /**
+     * Allow to add widget to search indexes.
+     * @param widget {@link WidgetEntity} which will be added to search indexes.
+     */
+    private void addWidgetToSearchIndexes(WidgetEntity widget) {
+        int zIndex = widget.getZIndex();
+        int x1 =  widget.getXCoordinate();
+        int y1 = widget.getYCoordinate();
+        int x2 = x1 + widget.getWidth();
+        int y2 = y1 + widget.getHeight();
 
         addWidgetToSearchIndex(x1CoordinateSearchIndex, x1, zIndex);
         addWidgetToSearchIndex(y1CoordinateSearchIndex, y1, zIndex);
         addWidgetToSearchIndex(x2CoordinateSearchIndex, x2, zIndex);
         addWidgetToSearchIndex(y2CoordinateSearchIndex, y2, zIndex);
+    }
+
+    /**
+     * Allow to remove widget from search indexes.
+     * @param widget {@link WidgetEntity} which will be removed from search indexes.
+     */
+    private void removeWidgetFromSearchIndexes(WidgetEntity widget) {
+        int zIndex = widget.getZIndex();
+        int x1 =  widget.getXCoordinate();
+        int y1 = widget.getYCoordinate();
+        int x2 = x1 + widget.getWidth();
+        int y2 = y1 + widget.getHeight();
+        removeWidgetFromSearchIndex(x1CoordinateSearchIndex, x1, zIndex);
+        removeWidgetFromSearchIndex(y1CoordinateSearchIndex, y1, zIndex);
+        removeWidgetFromSearchIndex(x2CoordinateSearchIndex, x2, zIndex);
+        removeWidgetFromSearchIndex(y2CoordinateSearchIndex, y2, zIndex);
+    }
+
+    /**
+     * Allow to set widget indexes.
+     * @param oldWidget {@link WidgetEntity} widget with old params.
+     * @param newWidget {@link WidgetEntity} widget with new params.
+     */
+    private void setFilteringIndexes(WidgetEntity oldWidget, WidgetEntity newWidget) {
+        if (oldWidget != null && oldWidget.getZIndex() == newWidget.getZIndex()) {
+            removeWidgetFromSearchIndexes(oldWidget);
+        }
+
+        addWidgetToSearchIndexes(newWidget);
     }
 
     /**
@@ -181,6 +214,7 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
                     int newWidgetZIndex = widget.getZIndex() + 1;
                     widget.setZIndex(newWidgetZIndex);
                     widget.markUpdated();
+                    addWidgetToSearchIndexes(widget);
                     widgetsStorage.put(newWidgetZIndex, widget);
                     widgetsIdsToZIndexesStorage.put(widget.getId(), newWidgetZIndex);
                 });
