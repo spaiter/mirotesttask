@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Collectors;
 
 @Repository
 public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateDTO> {
@@ -131,6 +132,22 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
     }
 
     /**
+     * Allow to get all widgets in repository by page.
+     * @param page Page of widgets you want to get. Min value is 1.
+     * @param size Number of widgets in page. Min value is 1.
+     * @return {@link List<WidgetEntity>} Widgets in repository on page.
+     */
+    public List<WidgetEntity> findAllEntities(int page, int size) {
+        return widgetsStorage
+                .descendingMap()
+                .values()
+                .stream()
+                .skip(page * size)
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Allow to get current max z-index of all widgets.
      * @return {@link WidgetEntity} max z-index.
      */
@@ -173,5 +190,14 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
     public void purge() {
         widgetsStorage.clear();
         widgetsIdsToZIndexesStorage.clear();
+    }
+
+    /**
+     * Allow to get all widgets count.
+     * @return count of all widgets.
+     */
+    @Override
+    public int getCount() {
+        return widgetsStorage.size();
     }
 }

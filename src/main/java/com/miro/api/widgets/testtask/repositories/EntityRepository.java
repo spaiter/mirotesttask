@@ -31,6 +31,14 @@ public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO> {
     List<Entity> findAllEntities();
 
     /**
+     * Allow to get entities from repository by page.
+     * @param page Page of entities you want to get. Min value is 0.
+     * @param size Number of entities in page. Min value is 1.
+     * @return List of entities on page.
+     */
+    List<Entity> findAllEntities(int page, int size);
+
+    /**
      * Allow to save (upsert) entity in repository.
      * @param entity Any entity to save.
      * @return just saved entity.
@@ -50,4 +58,11 @@ public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO> {
      * Allow to remove all entities from repository.
      */
     void purge();
+
+
+    /**
+     * Allow to get all entities count.
+     * @return count of all entities.
+     */
+    int getCount();
 }

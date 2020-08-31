@@ -6,6 +6,9 @@ import com.miro.api.widgets.testtask.dto.WidgetUpdateDTO;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
 import com.miro.api.widgets.testtask.repositories.ShiftableIntIndexEntityRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
+
     private final ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateDTO> widgetsRepository;
 
     /**
@@ -143,5 +147,37 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
                 .stream()
                 .map(this::convertWidgetEntityToWidgetResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<WidgetResponseDTO> getAllWidgets(Pageable pageRequest) {
+        long stamp = lock.tryOptimisticRead();
+
+        int page = pageRequest.getPageNumber();
+        int size = pageRequest.getPageSize();
+
+        List<WidgetEntity> widgets = widgetsRepository.findAllEntities(page, size);
+
+        if(!lock.validate(stamp)) {
+            stamp = lock.readLock();
+            try {
+                int widgetsCount = widgetsRepository.getCount();
+                List<WidgetResponseDTO> widgetResponses = widgetsRepository
+                        .findAllEntities(page, size)
+                        .stream()
+                        .map(this::convertWidgetEntityToWidgetResponseDTO)
+                        .collect(Collectors.toList());
+                return new PageImpl<>(widgetResponses, pageRequest, widgetsCount);
+            } finally {
+                lock.unlock(stamp);
+            }
+        }
+
+        int widgetsCount = widgetsRepository.getCount();
+        List<WidgetResponseDTO> widgetResponses = widgets
+                .stream()
+                .map(this::convertWidgetEntityToWidgetResponseDTO)
+                .collect(Collectors.toList());
+        return new PageImpl<>(widgetResponses, pageRequest, widgetsCount);
     }
 }

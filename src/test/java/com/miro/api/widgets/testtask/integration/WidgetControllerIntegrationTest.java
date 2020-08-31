@@ -1,16 +1,22 @@
 package com.miro.api.widgets.testtask.integration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.miro.api.widgets.testtask.dto.WidgetCreateRequestDTO;
 import com.miro.api.widgets.testtask.dto.WidgetResponseDTO;
 import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import com.miro.api.widgets.testtask.exceptions.ErrorResponse;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
+import com.miro.api.widgets.testtask.utils.PageObjectMapperModule;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -24,12 +30,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class WidgetControllerIntegrationTest {
 
     @Autowired
@@ -44,6 +52,11 @@ public class WidgetControllerIntegrationTest {
     @AfterEach
     private void purgeRepo() {
         repository.purge();
+    }
+
+    @BeforeAll
+    private void addObjectMapperModules() {
+        objectMapper.registerModule(new PageObjectMapperModule());
     }
 
     @Test
@@ -170,6 +183,91 @@ public class WidgetControllerIntegrationTest {
         assertThat(widgets.get(3).getZIndex()).isEqualTo(20);
         assertThat(widgets.get(4).getZIndex()).isEqualTo(21);
         assertThat(widgets.get(5).getZIndex()).isEqualTo(30);
+    }
+
+
+    @Test
+    public void whenGetManyByPage_thenCorrectResponse() throws Exception {
+        List<WidgetResponseDTO> requests = IntStream
+                .range(1, 1001)
+                .mapToObj(i -> new WidgetCreateRequestDTO(i, i, i, i, i))
+                .map(request -> {
+                    try {
+                        return objectMapper.writeValueAsString(request);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }).filter(Objects::nonNull).map(json -> {
+                    try {
+                        return mockMvc.perform(MockMvcRequestBuilders.post("/widgets")
+                                .content(json)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isCreated())
+                                .andReturn();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }).filter(Objects::nonNull).map(response -> {
+                    try {
+                        return response.getResponse().getContentAsString();
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }).filter(Objects::nonNull).map(result -> {
+                    try {
+                        return objectMapper.readValue(result, WidgetResponseDTO.class);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }).filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/widgets")
+                .queryParam("page", "3")
+                .queryParam("size", "100")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String actualResponseBody = result.getResponse().getContentAsString();
+        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        List<WidgetResponseDTO> widgets = responseDTO.getContent();
+
+        assertThat(widgets.size()).isEqualTo(100);
+        assertThat(widgets.get(0).getId()).isEqualTo(requests.get(300).getId());
+
+        result = mockMvc.perform(MockMvcRequestBuilders.get("/widgets")
+                .queryParam("page", "0")
+                .queryParam("size", "500")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        actualResponseBody = result.getResponse().getContentAsString();
+        responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        widgets = responseDTO.getContent();
+
+        assertThat(widgets.size()).isEqualTo(500);
+        assertThat(widgets.get(0).getId()).isEqualTo(requests.get(0).getId());
+        assertThat(widgets.get(499).getId()).isEqualTo(requests.get(499).getId());
+
+        result = mockMvc.perform(MockMvcRequestBuilders.get("/widgets")
+                .queryParam("page", "-1")
+                .queryParam("size", "1000")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+        actualResponseBody = result.getResponse().getContentAsString();
+        ErrorResponse validationError = objectMapper.readValue(actualResponseBody, ErrorResponse.class);
+        validationError.getDetails().sort(String::compareTo);
+
+        assertThat(validationError.getMessage()).isEqualTo("Invalid query params.");
+        assertThat(validationError.getDetails().size()).isEqualTo(2);
+
+        assertThat(validationError.getDetails().get(0)).isEqualTo("page - must be greater than or equal to 0");
+        assertThat(validationError.getDetails().get(1)).isEqualTo("size - must be less than or equal to 500");
     }
 
 }

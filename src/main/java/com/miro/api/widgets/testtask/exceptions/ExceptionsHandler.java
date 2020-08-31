@@ -6,10 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -31,7 +35,23 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
                     return String.format("%s - %s", fieldName, message);
                 })
                 .collect(Collectors.toList());
-        ErrorResponse error = new ErrorResponse("Validation Failed", details);
+        ErrorResponse error = new ErrorResponse("Validation Failed.", details);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleMissingParams(ConstraintViolationException ex) {
+        List<String> details = ex
+                .getConstraintViolations()
+                .stream()
+                .map(violation -> {
+                    String fieldName = violation.getPropertyPath().toString().split("\\.")[1];
+                    String message = violation.getMessage();
+                    return String.format("%s - %s", fieldName, message);
+                })
+                .collect(Collectors.toList());
+        ErrorResponse error = new ErrorResponse("Invalid query params.", details);
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }
