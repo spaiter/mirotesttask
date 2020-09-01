@@ -4,7 +4,7 @@ import com.miro.api.widgets.testtask.dto.AppLayerDTO;
 import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
 import com.miro.api.widgets.testtask.dto.WidgetFilterDTO;
 import com.miro.api.widgets.testtask.dto.WidgetUpdateDTO;
-import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import com.miro.api.widgets.testtask.entities.WidgetCustomEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -26,8 +26,8 @@ public interface WidgetService<Response extends AppLayerDTO> {
 
     /**
      * Allow to find widget by its ID. Returns empty Optional if widget not exists, otherwise returns Optional with widget.
-     * @param id {@link WidgetEntity} unique ID.
-     * @return {@link Optional<WidgetEntity>}
+     * @param id {@link WidgetCustomEntity} unique ID.
+     * @return {@link Optional< WidgetCustomEntity >}
      */
     Optional<Response> getWidgetById(String id);
 

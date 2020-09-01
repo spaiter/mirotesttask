@@ -4,7 +4,7 @@ package com.miro.api.widgets.testtask.services;
 import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
 import com.miro.api.widgets.testtask.dto.WidgetCreateRequestDTO;
 import com.miro.api.widgets.testtask.dto.WidgetResponseDTO;
-import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import com.miro.api.widgets.testtask.entities.WidgetCustomEntity;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +33,7 @@ class WidgetServiceImplUnitTest {
     public void whenCreateAndSaveWidgetByConstructorParams_thenReturnWidgetEntity() {
         final WidgetCreateRequestDTO widgetParams = new WidgetCreateRequestDTO(10, 20, 30, 40, 50);
         final WidgetCreateDTO createDTO = new WidgetCreateDTO(widgetParams);
-        final WidgetEntity widget = new WidgetEntity(10, 20, 30, 40, 50);
+        final WidgetCustomEntity widget = new WidgetCustomEntity(10, 20, 30, 40, 50);
         given(widgetRepository.isNeedToShift(30)).willReturn(false);
         given(widgetRepository.createEntity(createDTO)).willReturn(widget);
         given(widgetRepository.saveEntity(widget)).willReturn(widget);
@@ -47,8 +47,8 @@ class WidgetServiceImplUnitTest {
     public void whenCreateAndSaveWidgetByConstructorParamsWithNullZIndex_thenReturnWidgetEntityWithTopZIndex() {
         final WidgetCreateRequestDTO widgetParams = new WidgetCreateRequestDTO(10, 20, 30, 40, 50);
         final WidgetCreateDTO createDTO = new WidgetCreateDTO(widgetParams);
-        final WidgetEntity widget = new WidgetEntity(10, 20, 30, 40, 50);
-        final WidgetEntity prevWidgetWithSameZIndex = new WidgetEntity(10, 20, 31, 40, 50);
+        final WidgetCustomEntity widget = new WidgetCustomEntity(10, 20, 30, 40, 50);
+        final WidgetCustomEntity prevWidgetWithSameZIndex = new WidgetCustomEntity(10, 20, 31, 40, 50);
 
         given(widgetRepository.isNeedToShift(30)).willReturn(true);
         given(widgetRepository.createEntity(createDTO)).willReturn(widget);
@@ -88,7 +88,7 @@ class WidgetServiceImplUnitTest {
 
     @Test
     void whenGetWidgetByExistingId_thenReturnOptionalWithWidgetEntity() {
-        final WidgetEntity widget = new WidgetEntity(10, 20, 30, 40, 50);
+        final WidgetCustomEntity widget = new WidgetCustomEntity(10, 20, 30, 40, 50);
         given(widgetRepository.findEntityById(widget.getId())).willReturn(Optional.of(widget));
 
         Optional<WidgetResponseDTO> foundWidget = widgetService.getWidgetById(widget.getId());
@@ -129,12 +129,12 @@ class WidgetServiceImplUnitTest {
 
     @Test
     void whenGetAllWidgets_thenReturnWidgetsListOrderedAscByZIndex() {
-        final WidgetEntity widget1 = new WidgetEntity(1, 1, 1, 1, 1);
-        final WidgetEntity widget2 = new WidgetEntity(2, 2, 2, 2, 2);
-        final WidgetEntity widget3 = new WidgetEntity(3, 3, 3, 3, 3);
+        final WidgetCustomEntity widget1 = new WidgetCustomEntity(1, 1, 1, 1, 1);
+        final WidgetCustomEntity widget2 = new WidgetCustomEntity(2, 2, 2, 2, 2);
+        final WidgetCustomEntity widget3 = new WidgetCustomEntity(3, 3, 3, 3, 3);
 
-        List<WidgetEntity> widgets = List.of(widget1, widget2, widget3);
-        List<String> widgetsIds = widgets.stream().map(WidgetEntity::getId).collect(Collectors.toList());
+        List<WidgetCustomEntity> widgets = List.of(widget1, widget2, widget3);
+        List<String> widgetsIds = widgets.stream().map(WidgetCustomEntity::getId).collect(Collectors.toList());
 
         given(widgetRepository.findAllEntities()).willReturn(widgets);
 

@@ -1,7 +1,6 @@
 package com.miro.api.widgets.testtask.repositories;
 
 import com.miro.api.widgets.testtask.dto.ServiceLayerDTO;
-import com.miro.api.widgets.testtask.entities.WidgetEntity;
 
 /**
  * Common CRUD interface for any entity repository, where entity could be shifted by unique int index.

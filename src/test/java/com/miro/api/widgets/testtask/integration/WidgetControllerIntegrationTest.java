@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.miro.api.widgets.testtask.dto.WidgetCreateRequestDTO;
 import com.miro.api.widgets.testtask.dto.WidgetResponseDTO;
 import com.miro.api.widgets.testtask.dto.WidgetUpdateRequestDTO;
-import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import com.miro.api.widgets.testtask.entities.WidgetCustomEntity;
 import com.miro.api.widgets.testtask.exceptions.ErrorResponse;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
 import com.miro.api.widgets.testtask.utils.PageObjectMapperModule;
@@ -74,7 +74,7 @@ public class WidgetControllerIntegrationTest {
         String actualResponseBody = result.getResponse().getContentAsString();
         WidgetResponseDTO responseDTO = objectMapper.readValue(actualResponseBody, WidgetResponseDTO.class);
 
-        Optional<WidgetEntity> widget = repository.findEntityById(responseDTO.getId());
+        Optional<WidgetCustomEntity> widget = repository.findEntityById(responseDTO.getId());
 
         assertTrue(widget.isPresent());
         assertThat(widget.get().getXCoordinate()).isEqualTo(10);

@@ -4,7 +4,7 @@ import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
 import com.miro.api.widgets.testtask.dto.WidgetFilterDTO;
 import com.miro.api.widgets.testtask.dto.WidgetResponseDTO;
 import com.miro.api.widgets.testtask.dto.WidgetUpdateDTO;
-import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import com.miro.api.widgets.testtask.entities.WidgetCustomEntity;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
 import com.miro.api.widgets.testtask.repositories.ShiftableIntIndexEntityRepository;
 import com.miro.api.widgets.testtask.utils.PageHelperWrapper;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
 
-    private final ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateDTO, WidgetFilterDTO> widgetsRepository;
+    private final ShiftableIntIndexEntityRepository<WidgetCustomEntity, WidgetCreateDTO, WidgetFilterDTO> widgetsRepository;
 
     /**
      * Stamped lock using for atomic concurrent read / write operations on widgetsIdsToIndexesStorage and widgetsStorage.
@@ -35,7 +35,7 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
         widgetsRepository = repository;
     }
 
-    private WidgetResponseDTO convertWidgetEntityToWidgetResponseDTO(WidgetEntity widgetEntity) {
+    private WidgetResponseDTO convertWidgetEntityToWidgetResponseDTO(WidgetCustomEntity widgetEntity) {
         return new WidgetResponseDTO(
                 widgetEntity.getId(),
                 widgetEntity.getXCoordinate(),
@@ -69,7 +69,7 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
             } else {
                 createDTO.setZIndex(widgetsRepository.getMaxIndex() + 1);
             }
-            WidgetEntity widget = widgetsRepository.createEntity(createDTO);
+            WidgetCustomEntity widget = widgetsRepository.createEntity(createDTO);
             widgetsRepository.saveEntity(widget);
             return convertWidgetEntityToWidgetResponseDTO(widget);
         } finally {
@@ -80,7 +80,7 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
     @Override
     public Optional<WidgetResponseDTO> getWidgetById(String id) {
         long stamp = lock.tryOptimisticRead();
-        Optional<WidgetEntity> widget = widgetsRepository.findEntityById(id);
+        Optional<WidgetCustomEntity> widget = widgetsRepository.findEntityById(id);
 
         if(!lock.validate(stamp)) {
             stamp = lock.readLock();
@@ -98,9 +98,9 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
         checkWidthAndHeightForNegativeValue(updateDTO.getHeight(), updateDTO.getWidth());
         long stamp = lock.writeLock();
         try {
-            Optional<WidgetEntity> widget = widgetsRepository.findEntityById(id);
+            Optional<WidgetCustomEntity> widget = widgetsRepository.findEntityById(id);
             widget.map(w -> {
-                WidgetEntity widgetEntity = new WidgetEntity(
+                WidgetCustomEntity widgetEntity = new WidgetCustomEntity(
                         updateDTO.getXCoordinate(),
                         updateDTO.getYCoordinate(),
                         updateDTO.getZIndex(),
@@ -134,7 +134,7 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
     @Override
     public List<WidgetResponseDTO> getAllWidgets() {
         long stamp = lock.tryOptimisticRead();
-        List<WidgetEntity> widgets = widgetsRepository.findAllEntities();
+        List<WidgetCustomEntity> widgets = widgetsRepository.findAllEntities();
 
         if(!lock.validate(stamp)) {
             stamp = lock.readLock();
@@ -161,7 +161,7 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
         int page = pageRequest.getPageNumber();
         int size = pageRequest.getPageSize();
 
-        PageHelperWrapper<WidgetEntity> widgets = widgetsRepository.findAllEntities(page, size);
+        PageHelperWrapper<WidgetCustomEntity> widgets = widgetsRepository.findAllEntities(page, size);
 
         if(!lock.validate(stamp)) {
             stamp = lock.readLock();
@@ -199,7 +199,7 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
         int page = pageRequest.getPageNumber();
         int size = pageRequest.getPageSize();
 
-        PageHelperWrapper<WidgetEntity> widgets = widgetsRepository.getFilteredEntities(page, size, filterDTO);
+        PageHelperWrapper<WidgetCustomEntity> widgets = widgetsRepository.getFilteredEntities(page, size, filterDTO);
 
         if(!lock.validate(stamp)) {
             stamp = lock.readLock();

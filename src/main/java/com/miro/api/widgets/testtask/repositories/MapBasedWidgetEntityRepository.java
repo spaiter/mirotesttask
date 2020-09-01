@@ -2,7 +2,7 @@ package com.miro.api.widgets.testtask.repositories;
 
 import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
 import com.miro.api.widgets.testtask.dto.WidgetFilterDTO;
-import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import com.miro.api.widgets.testtask.entities.WidgetCustomEntity;
 import com.miro.api.widgets.testtask.utils.PageHelperWrapper;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 @Repository
-public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetEntity, WidgetCreateDTO, WidgetFilterDTO> {
+public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetCustomEntity, WidgetCreateDTO, WidgetFilterDTO> {
     /**
      * Hash map that is store widgets ids to their indexes.
      */
@@ -41,7 +41,7 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
      * Allow to remove widget from search index.
      * @param searchIndex One of search indexes.
      * @param key Key of search index.
-     * @param zIndex {@link WidgetEntity} z-index.
+     * @param zIndex {@link WidgetCustomEntity} z-index.
      */
     private void removeWidgetFromSearchIndex(TreeMap<Integer, Set<Integer>> searchIndex, int key, int zIndex) {
         Set<Integer> zIndexes = searchIndex.get(key);
@@ -57,7 +57,7 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
      * Allow to add widget to search index.
      * @param searchIndex One of search indexes.
      * @param key Key of search index.
-     * @param zIndex {@link WidgetEntity} z-index.
+     * @param zIndex {@link WidgetCustomEntity} z-index.
      */
     private void addWidgetToSearchIndex(TreeMap<Integer, Set<Integer>> searchIndex, int key, int zIndex) {
         Set<Integer> zIndexes = searchIndex.get(key);
@@ -72,9 +72,9 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
 
     /**
      * Allow to add widget to search indexes.
-     * @param widget {@link WidgetEntity} which will be added to search indexes.
+     * @param widget {@link WidgetCustomEntity} which will be added to search indexes.
      */
-    private void addWidgetToSearchIndexes(WidgetEntity widget) {
+    private void addWidgetToSearchIndexes(WidgetCustomEntity widget) {
         int zIndex = widget.getZIndex();
         int x1 =  widget.getXCoordinate();
         int y1 = widget.getYCoordinate();
@@ -89,9 +89,9 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
 
     /**
      * Allow to remove widget from search indexes.
-     * @param widget {@link WidgetEntity} which will be removed from search indexes.
+     * @param widget {@link WidgetCustomEntity} which will be removed from search indexes.
      */
-    private void removeWidgetFromSearchIndexes(WidgetEntity widget) {
+    private void removeWidgetFromSearchIndexes(WidgetCustomEntity widget) {
         int zIndex = widget.getZIndex();
         int x1 =  widget.getXCoordinate();
         int y1 = widget.getYCoordinate();
@@ -105,10 +105,10 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
 
     /**
      * Allow to set widget indexes.
-     * @param oldWidget {@link WidgetEntity} widget with old params.
-     * @param newWidget {@link WidgetEntity} widget with new params.
+     * @param oldWidget {@link WidgetCustomEntity} widget with old params.
+     * @param newWidget {@link WidgetCustomEntity} widget with new params.
      */
-    private void setFilteringIndexes(WidgetEntity oldWidget, WidgetEntity newWidget) {
+    private void setFilteringIndexes(WidgetCustomEntity oldWidget, WidgetCustomEntity newWidget) {
         if (oldWidget != null && oldWidget.getZIndex() == newWidget.getZIndex()) {
             removeWidgetFromSearchIndexes(oldWidget);
         }
@@ -119,11 +119,11 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
     /**
      * Tree map that is store widgets sorted descending by z-index.
      */
-    private final ConcurrentSkipListMap<Integer, WidgetEntity> widgetsStorage = new ConcurrentSkipListMap<>(Collections.reverseOrder());
+    private final ConcurrentSkipListMap<Integer, WidgetCustomEntity> widgetsStorage = new ConcurrentSkipListMap<>(Collections.reverseOrder());
 
     /**
      * Allow to get widget z-index by its id.
-     * @param id {@link WidgetEntity} Widget unique ID.
+     * @param id {@link WidgetCustomEntity} Widget unique ID.
      * @return Widget z-index mapped to its id.
      */
     private int getWidgetZIndexById(String id) {
@@ -132,7 +132,7 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
 
     /**
      * Check if widgets z-indexes needs to be shifted. Use on create.
-     * @param index {@link WidgetEntity} Widget z-index.
+     * @param index {@link WidgetCustomEntity} Widget z-index.
      * @return True if widgets z-indexes needs to be shifted, else false.
      */
     public boolean isNeedToShift(int index) {
@@ -142,15 +142,15 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
     /**
      * Check if widgets z-indexes needs to be shifted. Use on update.
      * We need to shift widgets only if widget with such z-index has same id, so it is widget update with same z-index.
-     * @param zIndex {@link WidgetEntity} Widget z-index.
-     * @param id {@link WidgetEntity} Widget id.
+     * @param zIndex {@link WidgetCustomEntity} Widget z-index.
+     * @param id {@link WidgetCustomEntity} Widget id.
      * @return True if widgets z-indexes needs to be shifted, else false.
      */
     public boolean isNeedToShift(int zIndex, String id) {
         if (!widgetsStorage.containsKey(zIndex)) {
             return false;
         }
-        WidgetEntity widget = widgetsStorage.get(zIndex);
+        WidgetCustomEntity widget = widgetsStorage.get(zIndex);
         return !widget.getId().equals(id);
     }
 
@@ -226,25 +226,25 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
      * @return widget entity created by constructor params object.
      */
     @Override
-    public WidgetEntity createEntity(WidgetCreateDTO createDTO) {
-        return new WidgetEntity(createDTO);
+    public WidgetCustomEntity createEntity(WidgetCreateDTO createDTO) {
+        return new WidgetCustomEntity(createDTO);
     }
 
     /**
      * Allow to find widget from repository by unique ID.
-     * @param id {@link WidgetEntity} Widget unique ID.
-     * @return {@link WidgetEntity} Widget entity if exists.
+     * @param id {@link WidgetCustomEntity} Widget unique ID.
+     * @return {@link WidgetCustomEntity} Widget entity if exists.
      */
-    public Optional<WidgetEntity> findEntityById(String id) {
+    public Optional<WidgetCustomEntity> findEntityById(String id) {
         Integer zIndex = this.getWidgetZIndexById(id);
         return Optional.ofNullable(widgetsStorage.get(zIndex));
     }
 
     /**
      * Allow to get all widgets in repository.
-     * @return {@link List<WidgetEntity>} All widgets in repository.
+     * @return {@link List< WidgetCustomEntity >} All widgets in repository.
      */
-    public List<WidgetEntity> findAllEntities() {
+    public List<WidgetCustomEntity> findAllEntities() {
         return new ArrayList<>(widgetsStorage.descendingMap().values());
     }
 
@@ -252,10 +252,10 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
      * Allow to get all widgets in repository by page.
      * @param page Page of widgets you want to get. Min value is 1.
      * @param size Number of widgets in page. Min value is 1.
-     * @return {@link List<WidgetEntity>} Widgets in repository on page.
+     * @return {@link List< WidgetCustomEntity >} Widgets in repository on page.
      */
-    public PageHelperWrapper<WidgetEntity> findAllEntities(int page, int size) {
-        List<WidgetEntity> widgets = widgetsStorage
+    public PageHelperWrapper<WidgetCustomEntity> findAllEntities(int page, int size) {
+        List<WidgetCustomEntity> widgets = widgetsStorage
                 .descendingMap()
                 .values()
                 .stream()
@@ -268,7 +268,7 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
 
     /**
      * Allow to get current max z-index of all widgets.
-     * @return {@link WidgetEntity} max z-index.
+     * @return {@link WidgetCustomEntity} max z-index.
      */
     public int getMaxIndex() {
         try {
@@ -280,12 +280,12 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
 
     /**
      * Allow to save (upsert) widget in repository with write lock.
-     * @param widgetEntity {@link List<WidgetEntity>} Widget entity to save (upsert).
+     * @param widgetEntity {@link List< WidgetCustomEntity >} Widget entity to save (upsert).
      */
     @Override
-    public WidgetEntity saveEntity(WidgetEntity widgetEntity) {
+    public WidgetCustomEntity saveEntity(WidgetCustomEntity widgetEntity) {
         int zIndex = widgetEntity.getZIndex();
-        WidgetEntity oldWidgetEntity = widgetsStorage.get(zIndex);
+        WidgetCustomEntity oldWidgetEntity = widgetsStorage.get(zIndex);
         setFilteringIndexes(oldWidgetEntity, widgetEntity);
         widgetsStorage.put(zIndex, widgetEntity);
         widgetsIdsToZIndexesStorage.put(widgetEntity.getId(), zIndex);
@@ -294,13 +294,13 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
 
     /**
      * Allow to remove widget by its ID from repository.
-     * @param id {@link List<WidgetEntity>} Widget unique ID.
+     * @param id {@link List< WidgetCustomEntity >} Widget unique ID.
      * @return True if widget was found and removed successfully, else false.
      */
     @Override
     public boolean deleteEntityById(String id) {
         int zIndex = this.getWidgetZIndexById(id);
-        WidgetEntity widget = widgetsStorage.get(zIndex);
+        WidgetCustomEntity widget = widgetsStorage.get(zIndex);
         removeWidgetFromSearchIndexes(widget);
         widgetsIdsToZIndexesStorage.remove(id);
         return widgetsStorage.remove(zIndex) != null;
@@ -355,7 +355,7 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
      * @return List of filtered widgets on page.
      */
     @Override
-    public PageHelperWrapper<WidgetEntity> getFilteredEntities(int page, int size, WidgetFilterDTO filter) {
+    public PageHelperWrapper<WidgetCustomEntity> getFilteredEntities(int page, int size, WidgetFilterDTO filter) {
         Set<Integer> x1Match = getSearchIndexSetOfZIndexes(x1CoordinateSearchIndex, filter.getX1(), true);
         Set<Integer> y1Match = getSearchIndexSetOfZIndexes(y1CoordinateSearchIndex, filter.getY1(), true);
         Set<Integer> x2Match = getSearchIndexSetOfZIndexes(x2CoordinateSearchIndex, filter.getX2(), false);
@@ -365,7 +365,7 @@ public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRe
         x1Match.retainAll(x2Match);
         x1Match.retainAll(y2Match);
 
-        List<WidgetEntity> widgets = x1Match
+        List<WidgetCustomEntity> widgets = x1Match
                 .stream()
                 .sorted()
                 .skip(page * size)

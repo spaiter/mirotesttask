@@ -2,7 +2,7 @@ package com.miro.api.widgets.testtask.repositories;
 
 import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
 import com.miro.api.widgets.testtask.dto.WidgetCreateRequestDTO;
-import com.miro.api.widgets.testtask.entities.WidgetEntity;
+import com.miro.api.widgets.testtask.entities.WidgetCustomEntity;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -17,7 +17,7 @@ public class MapBasedWidgetEntityRepositoryUnitTest {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
 
         WidgetCreateRequestDTO widgetParams = new WidgetCreateRequestDTO(10, 20, 30, 40, 50);
-        WidgetEntity widgetEntity = widgetEntityRepository.createEntity(new WidgetCreateDTO(widgetParams));
+        WidgetCustomEntity widgetEntity = widgetEntityRepository.createEntity(new WidgetCreateDTO(widgetParams));
         assertNotNull(widgetEntity.getId());
     }
 
@@ -26,11 +26,11 @@ public class MapBasedWidgetEntityRepositoryUnitTest {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
 
         long currentTimeStamp = Instant.now().getEpochSecond();
-        WidgetEntity widget = new WidgetEntity(10, 20, 30, 40, 50);
+        WidgetCustomEntity widget = new WidgetCustomEntity(10, 20, 30, 40, 50);
         widgetEntityRepository.saveEntity(widget);
-        Optional<WidgetEntity> justCreatedWidget = widgetEntityRepository.findEntityById(widget.getId());
+        Optional<WidgetCustomEntity> justCreatedWidget = widgetEntityRepository.findEntityById(widget.getId());
 
-        assertEquals(widget.getId(), justCreatedWidget.map(WidgetEntity::getId).orElse("unknown"), "widget id must be the same");
+        assertEquals(widget.getId(), justCreatedWidget.map(WidgetCustomEntity::getId).orElse("unknown"), "widget id must be the same");
         assertEquals(widget.getXCoordinate(), 10, "widget x-coordinate must be 10");
         assertEquals(widget.getYCoordinate(), 20, "widget y-coordinate must be 20");
         assertEquals(widget.getZIndex(), 30, "widget z-index must be 30");
@@ -41,12 +41,12 @@ public class MapBasedWidgetEntityRepositoryUnitTest {
     @Test
     public void widgetEntityRepositoryCanShiftWidgetsZIndexes() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
-        WidgetEntity widget1 = new WidgetEntity(1, 1, 100, 0, 0);
-        WidgetEntity widget2 = new WidgetEntity(2, 2, 101, 0, 0);
-        WidgetEntity widget3 = new WidgetEntity(3, 3, 110, 0, 0);
-        WidgetEntity widget4 = new WidgetEntity(4, 4, 120, 0, 0);
-        WidgetEntity widget5 = new WidgetEntity(5, 5, 100, 0, 0);
-        WidgetEntity widget6 = new WidgetEntity(6, 6, 100, 0, 0);
+        WidgetCustomEntity widget1 = new WidgetCustomEntity(1, 1, 100, 0, 0);
+        WidgetCustomEntity widget2 = new WidgetCustomEntity(2, 2, 101, 0, 0);
+        WidgetCustomEntity widget3 = new WidgetCustomEntity(3, 3, 110, 0, 0);
+        WidgetCustomEntity widget4 = new WidgetCustomEntity(4, 4, 120, 0, 0);
+        WidgetCustomEntity widget5 = new WidgetCustomEntity(5, 5, 100, 0, 0);
+        WidgetCustomEntity widget6 = new WidgetCustomEntity(6, 6, 100, 0, 0);
 
         widgetEntityRepository.saveEntity(widget1);
         widgetEntityRepository.saveEntity(widget2);
@@ -59,7 +59,7 @@ public class MapBasedWidgetEntityRepositoryUnitTest {
         widgetEntityRepository.shiftUpwards(widget6.getZIndex());
         widgetEntityRepository.saveEntity(widget6);
 
-        List<WidgetEntity> widgets = widgetEntityRepository.findAllEntities();
+        List<WidgetCustomEntity> widgets = widgetEntityRepository.findAllEntities();
 
         assertEquals(6, widgets.size());
 
@@ -81,9 +81,9 @@ public class MapBasedWidgetEntityRepositoryUnitTest {
     @Test
     public void widgetEntityRepositoryCanDeleteWidgetsById() {
         MapBasedWidgetEntityRepository widgetEntityRepository = new MapBasedWidgetEntityRepository();
-        WidgetEntity widget1 = new WidgetEntity(0, 0, 1, 0, 0);
-        WidgetEntity widget2 = new WidgetEntity(0, 0, 2, 0, 0);
-        WidgetEntity widget3 = new WidgetEntity(0, 0, 3, 0, 0);
+        WidgetCustomEntity widget1 = new WidgetCustomEntity(0, 0, 1, 0, 0);
+        WidgetCustomEntity widget2 = new WidgetCustomEntity(0, 0, 2, 0, 0);
+        WidgetCustomEntity widget3 = new WidgetCustomEntity(0, 0, 3, 0, 0);
 
         widgetEntityRepository.saveEntity(widget1);
         widgetEntityRepository.saveEntity(widget2);
@@ -92,7 +92,7 @@ public class MapBasedWidgetEntityRepositoryUnitTest {
         widgetEntityRepository.deleteEntityById(widget1.getId());
         widgetEntityRepository.deleteEntityById(widget3.getId());
 
-        List<WidgetEntity> widgets = widgetEntityRepository.findAllEntities();
+        List<WidgetCustomEntity> widgets = widgetEntityRepository.findAllEntities();
 
         assertEquals(1, widgets.size(), "Widgets count must become 1");
         assertEquals(widget2.getId(), widgets.get(0).getId(), "Last widget must be second widget");
