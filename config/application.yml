@@ -1,11 +1,30 @@
-ratelimit:
-  global: 1000
-#  endpoints:
-#    -
-#      method: GET
-#      path: /widgets
-#      limit: 100
-#    -
-#      method: POST
-#      path: /widgets
-#      limit: 1
+spring:
+  profiles: test
+config:
+  name: test
+  environment: test
+application:
+  ratelimit:
+    global: 0
+
+---
+spring:
+  profiles: prod
+config:
+  name: prod
+  environment: production
+application:
+  ratelimit:
+    global: 1000
+    endpoints:
+      -
+        method: GET
+        path: /widgets
+        limit: 100
+        params:
+          - page
+          - size
+      -
+        method: POST
+        path: /widgets
+        limit: 10

@@ -189,5 +189,6 @@
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-tree:7.2" level="project" />
     <orderEntry type="library" name="Maven: org.jacoco:org.jacoco.report:0.8.5" level="project" />
     <orderEntry type="library" name="Maven: com.github.vladimir-bukhtoyarov:bucket4j-core:4.10.0" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-configuration-processor:2.3.3.RELEASE" level="project" />
   </component>
 </module>

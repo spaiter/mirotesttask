@@ -1,11 +1,16 @@
 package com.miro.api.widgets.testtask.config;
 
-import org.springframework.core.convert.converter.Converter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+import java.util.List;
+
 @Component
-public class RateLimitConfig implements Converter<String, RateLimitConfig> {
+@ConfigurationProperties(prefix = "application.ratelimit")
+public class RateLimitConfig {
     private Integer global;
+    private List<EndpointRateLimit> endpoints;
 
     public Integer getGlobal() {
         return global;
@@ -15,9 +20,11 @@ public class RateLimitConfig implements Converter<String, RateLimitConfig> {
         this.global = global;
     }
 
-    @Override
-    public RateLimitConfig convert(String s) {
-        System.out.println(s);
-        return null;
+    public List<EndpointRateLimit> getEndpoints() {
+        return endpoints != null ? endpoints : Collections.emptyList();
+    }
+
+    public void setEndpoints(List<EndpointRateLimit> endpoints) {
+        this.endpoints = endpoints;
     }
 }

@@ -1,32 +1,27 @@
 package com.miro.api.widgets.testtask;
 
-import com.miro.api.widgets.testtask.interceptors.RateLimitInterceptor;
+import com.miro.api.widgets.testtask.config.AppConfig;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-@EnableScheduling
-public class MiroWidgetsRestApiTestApplication implements WebMvcConfigurer {
+public class MiroWidgetsRestApiTestApplication implements CommandLineRunner {
 
-    @Lazy
-    private final RateLimitInterceptor interceptor;
+    private final AppConfig config;
 
-    public MiroWidgetsRestApiTestApplication(RateLimitInterceptor interceptor) {
-        this.interceptor = interceptor;
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(interceptor)
-                .addPathPatterns("/widgets/**");
+    public MiroWidgetsRestApiTestApplication(AppConfig config) {
+        this.config = config;
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(MiroWidgetsRestApiTestApplication.class, args);
+        SpringApplication app = new SpringApplication(MiroWidgetsRestApiTestApplication.class);
+        app.run();
+    }
+
+    public void run(String... args) {
+        System.out.println("using environment: " + config.getConfig().getEnvironment());
+        System.out.println("name: " + config.getConfig().getName());
     }
 
 }
