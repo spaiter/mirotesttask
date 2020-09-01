@@ -4,10 +4,12 @@ import com.miro.api.widgets.testtask.interceptors.RateLimitInterceptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
+@EnableScheduling
 public class MiroWidgetsRestApiTestApplication implements WebMvcConfigurer {
 
     @Lazy
