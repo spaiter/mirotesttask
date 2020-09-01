@@ -135,7 +135,9 @@
     <orderEntry type="library" name="Maven: org.sonatype.sisu:sisu-guice:noaop:2.1.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-core:3.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-settings:3.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-settings-builder:3.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-settings-builder:3.3.9" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-builder-support:3.3.9" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.10" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-repository-metadata:3.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-model-builder:3.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.maven:maven-aether-provider:3.0" level="project" />
@@ -190,5 +192,18 @@
     <orderEntry type="library" name="Maven: org.jacoco:org.jacoco.report:0.8.5" level="project" />
     <orderEntry type="library" name="Maven: com.github.vladimir-bukhtoyarov:bucket4j-core:4.10.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-configuration-processor:2.3.3.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-actuator:2.3.3.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-actuator-autoconfigure:2.3.3.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-actuator:2.3.3.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: io.micrometer:micrometer-core:1.5.4" level="project" />
+    <orderEntry type="library" name="Maven: org.hdrhistogram:HdrHistogram:2.1.12" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.latencyutils:LatencyUtils:2.0.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-starter:2.1.1.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-context:2.1.1.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:5.3.4.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-commons:2.1.1.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-rsa:1.0.7.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.60" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.60" level="project" />
   </component>
 </module>
