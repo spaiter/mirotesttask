@@ -15,3 +15,6 @@ target/
 
 ### IntelliJ IDEA ###
 .idea
+
+### configs ###
+config/application.yml
