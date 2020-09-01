@@ -67,4 +67,18 @@ public interface WidgetService<Response extends AppLayerDTO> {
      * @return {@link Page<Response>}
      */
     Page<Response> getFilteredWidgets(Pageable pageRequest, WidgetFilterDTO filterDTO);
+
+    default void checkWidthAndHeightForNegativeValue(int height, int width) throws IllegalArgumentException {
+        if (height < 0) {
+            throw new IllegalArgumentException("Widget height can't be negative.");
+        }
+        if (width < 0) {
+            throw new IllegalArgumentException("Widget width can't be negative.");
+        }
+    }
+
+    /**
+     * Allow to clean repository.
+     */
+    void purge();
 }

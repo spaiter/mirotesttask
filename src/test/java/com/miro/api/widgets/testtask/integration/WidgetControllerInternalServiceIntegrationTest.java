@@ -3,17 +3,19 @@ package com.miro.api.widgets.testtask.integration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.miro.api.widgets.testtask.InternalTestConfiguration;
 import com.miro.api.widgets.testtask.dto.WidgetCreateRequestDTO;
 import com.miro.api.widgets.testtask.dto.WidgetResponseDTO;
 import com.miro.api.widgets.testtask.dto.WidgetUpdateRequestDTO;
-import com.miro.api.widgets.testtask.entities.WidgetCustomEntity;
 import com.miro.api.widgets.testtask.exceptions.ErrorResponse;
-import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
+import com.miro.api.widgets.testtask.services.WidgetService;
 import com.miro.api.widgets.testtask.utils.PageObjectMapperModule;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,21 +40,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
-public class WidgetControllerIntegrationTest {
+@Import(InternalTestConfiguration.class)
+public class WidgetControllerInternalServiceIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    private MapBasedWidgetEntityRepository repository;
+    private MockMvc mockMvc;
 
     @Autowired
-    private MockMvc mockMvc;
+    WidgetService<WidgetResponseDTO> widgetService;
 
     @AfterEach
     @BeforeEach
     private void purgeRepo() {
-        repository.purge();
+        widgetService.purge();
     }
 
     @BeforeAll
@@ -74,14 +77,19 @@ public class WidgetControllerIntegrationTest {
         String actualResponseBody = result.getResponse().getContentAsString();
         WidgetResponseDTO responseDTO = objectMapper.readValue(actualResponseBody, WidgetResponseDTO.class);
 
-        Optional<WidgetCustomEntity> widget = repository.findEntityById(responseDTO.getId());
+        result = mockMvc.perform(MockMvcRequestBuilders.get(String.format("/widgets/%s", responseDTO.getId()))
+                .content(jsonRequest)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        actualResponseBody = result.getResponse().getContentAsString();
+        responseDTO = objectMapper.readValue(actualResponseBody, WidgetResponseDTO.class);
 
-        assertTrue(widget.isPresent());
-        assertThat(widget.get().getXCoordinate()).isEqualTo(10);
-        assertThat(widget.get().getYCoordinate()).isEqualTo(20);
-        assertThat(widget.get().getZIndex()).isEqualTo(30);
-        assertThat(widget.get().getHeight()).isEqualTo(40);
-        assertThat(widget.get().getWidth()).isEqualTo(50);
+        assertThat(responseDTO.getXCoordinate()).isEqualTo(10);
+        assertThat(responseDTO.getYCoordinate()).isEqualTo(20);
+        assertThat(responseDTO.getZIndex()).isEqualTo(30);
+        assertThat(responseDTO.getHeight()).isEqualTo(40);
+        assertThat(responseDTO.getWidth()).isEqualTo(50);
     }
 
     @Test

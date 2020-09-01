@@ -27,7 +27,7 @@ class WidgetServiceImplUnitTest {
     private MapBasedWidgetEntityRepository widgetRepository;
 
     @InjectMocks
-    private WidgetServiceImpl widgetService;
+    private WidgetInternalService widgetService;
 
     @Test
     public void whenCreateAndSaveWidgetByConstructorParams_thenReturnWidgetEntity() {

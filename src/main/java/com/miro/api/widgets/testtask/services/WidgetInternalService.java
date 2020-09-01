@@ -6,8 +6,9 @@ import com.miro.api.widgets.testtask.dto.WidgetResponseDTO;
 import com.miro.api.widgets.testtask.dto.WidgetUpdateDTO;
 import com.miro.api.widgets.testtask.entities.WidgetCustomEntity;
 import com.miro.api.widgets.testtask.repositories.MapBasedWidgetEntityRepository;
-import com.miro.api.widgets.testtask.repositories.ShiftableIntIndexEntityRepository;
+import com.miro.api.widgets.testtask.repositories.InternalWidgetEntityRepository;
 import com.miro.api.widgets.testtask.utils.PageHelperWrapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,16 +23,17 @@ import java.util.stream.Collectors;
  * Widget service that implements all WidgetService interface contracts.
  */
 @Service
-public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
+@ConditionalOnProperty(value="beans.widgetservice.impl", havingValue = "WidgetInternalService", matchIfMissing = true)
+public class WidgetInternalService implements WidgetService<WidgetResponseDTO> {
 
-    private final ShiftableIntIndexEntityRepository<WidgetCustomEntity, WidgetCreateDTO, WidgetFilterDTO> widgetsRepository;
+    private final InternalWidgetEntityRepository<WidgetCustomEntity, WidgetCreateDTO, WidgetFilterDTO> widgetsRepository;
 
     /**
      * Stamped lock using for atomic concurrent read / write operations on widgetsIdsToIndexesStorage and widgetsStorage.
      */
     private final StampedLock lock = new StampedLock();
 
-    public WidgetServiceImpl(MapBasedWidgetEntityRepository repository) {
+    public WidgetInternalService(MapBasedWidgetEntityRepository repository) {
         widgetsRepository = repository;
     }
 
@@ -42,18 +44,9 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
                 widgetEntity.getYCoordinate(),
                 widgetEntity.getZIndex(),
                 widgetEntity.getHeight(),
-                widgetEntity.getHeight(),
+                widgetEntity.getWidth(),
                 widgetEntity.getUpdatedAt()
         );
-    }
-
-    private void checkWidthAndHeightForNegativeValue(int height, int width) throws IllegalArgumentException {
-        if (height < 0) {
-            throw new IllegalArgumentException("Widget height can't be negative.");
-        }
-        if (width < 0) {
-            throw new IllegalArgumentException("Widget width can't be negative.");
-        }
     }
 
     @Override
@@ -222,5 +215,13 @@ public class WidgetServiceImpl implements WidgetService<WidgetResponseDTO> {
                 .map(this::convertWidgetEntityToWidgetResponseDTO)
                 .collect(Collectors.toList());
         return new PageImpl<>(widgetResponses, pageRequest, widgets.getCount());
+    }
+
+    /**
+     * Allow to clean repository.
+     */
+    @Override
+    public void purge() {
+        widgetsRepository.purge();
     }
 }

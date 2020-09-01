@@ -13,6 +13,9 @@ spring:
 config:
   name: prod
   environment: production
+beans:
+  widgetservice:
+    impl: WidgetSqlService
 application:
   ratelimit:
     global: 1000

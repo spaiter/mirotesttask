@@ -1,9 +1,12 @@
 package com.miro.api.widgets.testtask.repositories;
 
+import com.miro.api.widgets.testtask.dto.ServiceLayerDTO;
+
 /**
- * Common interface for any entity repository, where entity could be shifted by unique int index.
+ * Common CRUD interface for any entity repository, where entity could be shifted by unique int index.
+ * @param <Entity> Any entity for CRUD operations and shifting.
  */
-public interface ShiftableIntIndexEntityRepository {
+public interface InternalWidgetEntityRepository<Entity, CreateDTO extends ServiceLayerDTO, FilterDTO extends ServiceLayerDTO> extends EntityRepository<Entity, CreateDTO, FilterDTO>, ShiftableIntIndexEntityRepository {
     /**
      * Allow to get max entity unique int index.
      * @return max entity index.

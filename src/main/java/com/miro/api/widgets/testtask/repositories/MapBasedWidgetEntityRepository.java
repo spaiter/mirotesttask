@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 @Repository
-public class MapBasedWidgetEntityRepository implements ShiftableIntIndexEntityRepository<WidgetCustomEntity, WidgetCreateDTO, WidgetFilterDTO> {
+public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepository<WidgetCustomEntity, WidgetCreateDTO, WidgetFilterDTO> {
     /**
      * Hash map that is store widgets ids to their indexes.
      */

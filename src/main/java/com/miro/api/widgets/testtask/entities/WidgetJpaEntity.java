@@ -1,14 +1,16 @@
 package com.miro.api.widgets.testtask.entities;
 
+import com.miro.api.widgets.testtask.dto.WidgetCreateDTO;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity(name="widget")
 @Table(name="widgets",
     indexes = {
-            @Index(name = "i_company_activity", columnList = "x1_coordinate,y1_coordinate,x2_coordinate,y2_coordinate"),
+            @Index(name = "filtering_index", columnList = "x1_coordinate,y1_coordinate,x2_coordinate,y2_coordinate"),
             @Index(name = "unique_index__z_index", columnList = "z_index")
     }
 )
@@ -46,6 +48,20 @@ public class WidgetJpaEntity extends AbstractWidgetEntity {
 
     @Column(name = "updated_at", nullable = false)
     private Long updatedAt = Instant.now().getEpochSecond();
+
+    public WidgetJpaEntity(WidgetCreateDTO createDTO) {
+        this.id = UUID.randomUUID().toString();
+        this.x1Coordinate = createDTO.getXCoordinate();
+        this.y1Coordinate = createDTO.getYCoordinate();
+        this.zIndex = createDTO.getZIndex();
+        this.x2Coordinate = createDTO.getXCoordinate() + createDTO.getWidth();
+        this.y2Coordinate = createDTO.getYCoordinate() + createDTO.getHeight();
+        this.updatedAt = Instant.now().getEpochSecond();
+    }
+
+    public WidgetJpaEntity() {
+
+    }
 
     public String getId() {
         return id;
