@@ -1,3 +1,4 @@
 package com.miro.api.widgets.testtask.dto;
 
-public interface ServiceLayerDTO extends DTO {}
+public interface ServiceLayerDTO extends DTO {
+}

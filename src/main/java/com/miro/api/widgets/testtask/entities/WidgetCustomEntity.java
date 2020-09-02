@@ -90,5 +90,7 @@ public class WidgetCustomEntity extends AbstractWidgetEntity {
         return updatedAt;
     }
 
-    public void setUpdatedAt(long updatedAt) { this.updatedAt = updatedAt; }
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

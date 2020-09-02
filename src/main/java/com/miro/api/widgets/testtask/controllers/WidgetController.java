@@ -32,7 +32,7 @@ public class WidgetController {
         return new ResponseEntity<>(widgetService.getAllWidgets(), HttpStatus.OK);
     }
 
-    @GetMapping(params = { "page", "size" })
+    @GetMapping(params = {"page", "size"})
     public ResponseEntity<Page<WidgetResponseDTO>> getWidgets(
             @RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(500) Integer size
@@ -41,7 +41,7 @@ public class WidgetController {
         return new ResponseEntity<>(widgetService.getAllWidgets(pageRequest), HttpStatus.OK);
     }
 
-    @GetMapping(params = { "page", "size", "x1", "y1", "x2", "y2" })
+    @GetMapping(params = {"page", "size", "x1", "y1", "x2", "y2"})
     public ResponseEntity<Page<WidgetResponseDTO>> getFilteredWidgets(
             @RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(500) Integer size,

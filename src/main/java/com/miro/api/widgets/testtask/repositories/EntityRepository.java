@@ -8,11 +8,13 @@ import java.util.Optional;
 
 /**
  * Common CRUD interface for any entity repository.
+ *
  * @param <Entity> Any entity for CRUD operations.
  */
 public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO, FilterDTO extends ServiceLayerDTO> {
     /**
      * Allow to create Entity from object with all necessary params.
+     *
      * @param createDTO Object with all params necessary to create Entity.
      * @return Entity
      */
@@ -20,6 +22,7 @@ public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO, Fil
 
     /**
      * Allow to search entity by its ID in repository.
+     *
      * @param id Entity unique ID.
      * @return Entity by unique id if exists.
      */
@@ -27,12 +30,14 @@ public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO, Fil
 
     /**
      * Allow to get all entities from repository.
+     *
      * @return List of all entities.
      */
     List<Entity> findAllEntities();
 
     /**
      * Allow to get entities from repository by page.
+     *
      * @param page Page of entities you want to get. Min value is 0.
      * @param size Number of entities in page. Min value is 1.
      * @return List of entities on page.
@@ -41,6 +46,7 @@ public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO, Fil
 
     /**
      * Allow to save (upsert) entity in repository.
+     *
      * @param entity Any entity to save.
      * @return just saved entity.
      */
@@ -49,6 +55,7 @@ public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO, Fil
 
     /**
      * Allow to remove entity by its ID from repository.
+     *
      * @param id Entity unique ID.
      * @return True if entity was found and removed successfully, else false.
      */
@@ -63,14 +70,16 @@ public interface EntityRepository<Entity, CreateDTO extends ServiceLayerDTO, Fil
 
     /**
      * Allow to get all entities count.
+     *
      * @return count of all entities.
      */
     int getCount();
 
     /**
      * Allow to get filtered entities from repository by page.
-     * @param page Page of entities you want to get. Min value is 0.
-     * @param size Number of entities in page. Min value is 1.
+     *
+     * @param page   Page of entities you want to get. Min value is 0.
+     * @param size   Number of entities in page. Min value is 1.
      * @param filter Object with filter properties.
      * @return List of filtered entities on page.
      */

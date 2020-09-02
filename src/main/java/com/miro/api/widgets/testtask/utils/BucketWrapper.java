@@ -13,8 +13,8 @@ public class BucketWrapper {
 
     public BucketWrapper(Integer limit) {
         this.limit = limit;
-        Bandwidth bandwidth =  Bandwidth.classic(this.limit, Refill.intervally(this.limit, Duration.ofMinutes(1)));;
-        this.bucket = Bucket4j.builder().addLimit(bandwidth).build();;
+        Bandwidth bandwidth = Bandwidth.classic(this.limit, Refill.intervally(this.limit, Duration.ofMinutes(1)));
+        this.bucket = Bucket4j.builder().addLimit(bandwidth).build();
     }
 
     public Integer getLimit() {

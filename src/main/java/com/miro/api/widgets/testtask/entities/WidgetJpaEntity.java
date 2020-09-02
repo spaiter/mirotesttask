@@ -7,12 +7,12 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
-@Entity(name="widget")
-@Table(name="widgets",
-    indexes = {
-            @Index(name = "filtering_index", columnList = "x1_coordinate,y1_coordinate,x2_coordinate,y2_coordinate"),
-            @Index(name = "unique_index__z_index", columnList = "z_index")
-    }
+@Entity(name = "widget")
+@Table(name = "widgets",
+        indexes = {
+                @Index(name = "filtering_index", columnList = "x1_coordinate,y1_coordinate,x2_coordinate,y2_coordinate"),
+                @Index(name = "unique_index__z_index", columnList = "z_index")
+        }
 )
 public class WidgetJpaEntity extends AbstractWidgetEntity {
 

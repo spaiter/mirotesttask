@@ -18,6 +18,7 @@ public interface WidgetService<Response extends AppLayerDTO> {
 
     /**
      * Allow to create widget by widget constructor params object and save it.
+     *
      * @param createDTO {@link WidgetCreateDTO} Object with all necessary params to create widget. Not {@code null}
      * @return just created widget with specified parameters.
      * @throws IllegalArgumentException throws if height or width params are negative.
@@ -26,6 +27,7 @@ public interface WidgetService<Response extends AppLayerDTO> {
 
     /**
      * Allow to find widget by its ID. Returns empty Optional if widget not exists, otherwise returns Optional with widget.
+     *
      * @param id {@link WidgetCustomEntity} unique ID.
      * @return {@link Optional< WidgetCustomEntity >}
      */
@@ -33,7 +35,8 @@ public interface WidgetService<Response extends AppLayerDTO> {
 
     /**
      * Allow to update widget by its ID.
-     * @param id {@link Response} unique ID.
+     *
+     * @param id        {@link Response} unique ID.
      * @param updateDTO {@link WidgetUpdateDTO} Object with all necessary params to update widget. Not {@code null}
      * @return {@link Response}
      * @throws IllegalArgumentException throws if height or width params are negative.
@@ -48,6 +51,7 @@ public interface WidgetService<Response extends AppLayerDTO> {
 
     /**
      * Allow to get all widgets, sorted ascend by z-index.
+     *
      * @return {@link List<Response>}
      */
     List<Response> getAllWidgets();
@@ -55,6 +59,7 @@ public interface WidgetService<Response extends AppLayerDTO> {
 
     /**
      * Allow to get widgets with pagination, sorted ascend by z-index.
+     *
      * @param pageRequest {@link Pageable} any object that implements Pageable interface.
      * @return {@link Page<Response>}
      */
@@ -62,8 +67,9 @@ public interface WidgetService<Response extends AppLayerDTO> {
 
     /**
      * Allow to get filtered widgets with pagination, sorted ascend by z-index.
+     *
      * @param pageRequest {@link Pageable} any object that implements Pageable interface.
-     * @param filterDTO DTO {@link WidgetFilterDTO} with filtering properties.
+     * @param filterDTO   DTO {@link WidgetFilterDTO} with filtering properties.
      * @return {@link Page<Response>}
      */
     Page<Response> getFilteredWidgets(Pageable pageRequest, WidgetFilterDTO filterDTO);

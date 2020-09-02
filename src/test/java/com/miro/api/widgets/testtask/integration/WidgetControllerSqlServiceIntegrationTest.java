@@ -290,7 +290,7 @@ public class WidgetControllerSqlServiceIntegrationTest {
                     }
                     return null;
                 }).filter(Objects::nonNull)
-                        .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/widgets")
                 .queryParam("page", "3")
@@ -299,7 +299,8 @@ public class WidgetControllerSqlServiceIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         String actualResponseBody = result.getResponse().getContentAsString();
-        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {
+        });
         List<WidgetResponseDTO> widgets = responseDTO.getContent();
 
         assertThat(widgets.size()).isEqualTo(100);
@@ -312,7 +313,8 @@ public class WidgetControllerSqlServiceIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         actualResponseBody = result.getResponse().getContentAsString();
-        responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {
+        });
         widgets = responseDTO.getContent();
 
         assertThat(widgets.size()).isEqualTo(500);
@@ -390,7 +392,8 @@ public class WidgetControllerSqlServiceIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         String actualResponseBody = result.getResponse().getContentAsString();
-        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {
+        });
         List<WidgetResponseDTO> widgets = responseDTO.getContent();
 
         assertThat(widgets.size()).isEqualTo(3);
@@ -470,7 +473,8 @@ public class WidgetControllerSqlServiceIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         String actualResponseBody = result.getResponse().getContentAsString();
-        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {
+        });
         List<WidgetResponseDTO> widgets = responseDTO.getContent();
 
         assertThat(widgets.size()).isEqualTo(2);
@@ -531,7 +535,8 @@ public class WidgetControllerSqlServiceIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         String actualResponseBody = result.getResponse().getContentAsString();
-        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {
+        });
         List<WidgetResponseDTO> allWidgets = responseDTO.getContent();
 
         assertThat(allWidgets.size()).isEqualTo(6);
@@ -547,7 +552,8 @@ public class WidgetControllerSqlServiceIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         actualResponseBody = result.getResponse().getContentAsString();
-        responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {
+        });
         List<WidgetResponseDTO> filteredWidgets = responseDTO.getContent();
 
         assertThat(filteredWidgets.size()).isEqualTo(4);
@@ -615,7 +621,8 @@ public class WidgetControllerSqlServiceIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         String actualResponseBody = result.getResponse().getContentAsString();
-        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {});
+        Page<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {
+        });
         List<WidgetResponseDTO> filteredWidgets = responseDTO.getContent();
 
         assertThat(filteredWidgets.size()).isEqualTo(2);

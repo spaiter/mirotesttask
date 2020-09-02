@@ -39,9 +39,10 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to remove widget from search index.
+     *
      * @param searchIndex One of search indexes.
-     * @param key Key of search index.
-     * @param zIndex {@link WidgetCustomEntity} z-index.
+     * @param key         Key of search index.
+     * @param zIndex      {@link WidgetCustomEntity} z-index.
      */
     private void removeWidgetFromSearchIndex(TreeMap<Integer, Set<Integer>> searchIndex, int key, int zIndex) {
         Set<Integer> zIndexes = searchIndex.get(key);
@@ -55,9 +56,10 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to add widget to search index.
+     *
      * @param searchIndex One of search indexes.
-     * @param key Key of search index.
-     * @param zIndex {@link WidgetCustomEntity} z-index.
+     * @param key         Key of search index.
+     * @param zIndex      {@link WidgetCustomEntity} z-index.
      */
     private void addWidgetToSearchIndex(TreeMap<Integer, Set<Integer>> searchIndex, int key, int zIndex) {
         Set<Integer> zIndexes = searchIndex.get(key);
@@ -72,11 +74,12 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to add widget to search indexes.
+     *
      * @param widget {@link WidgetCustomEntity} which will be added to search indexes.
      */
     private void addWidgetToSearchIndexes(WidgetCustomEntity widget) {
         int zIndex = widget.getZIndex();
-        int x1 =  widget.getXCoordinate();
+        int x1 = widget.getXCoordinate();
         int y1 = widget.getYCoordinate();
         int x2 = x1 + widget.getWidth();
         int y2 = y1 + widget.getHeight();
@@ -89,11 +92,12 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to remove widget from search indexes.
+     *
      * @param widget {@link WidgetCustomEntity} which will be removed from search indexes.
      */
     private void removeWidgetFromSearchIndexes(WidgetCustomEntity widget) {
         int zIndex = widget.getZIndex();
-        int x1 =  widget.getXCoordinate();
+        int x1 = widget.getXCoordinate();
         int y1 = widget.getYCoordinate();
         int x2 = x1 + widget.getWidth();
         int y2 = y1 + widget.getHeight();
@@ -105,6 +109,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to set widget indexes.
+     *
      * @param oldWidget {@link WidgetCustomEntity} widget with old params.
      * @param newWidget {@link WidgetCustomEntity} widget with new params.
      */
@@ -123,6 +128,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to get widget z-index by its id.
+     *
      * @param id {@link WidgetCustomEntity} Widget unique ID.
      * @return Widget z-index mapped to its id.
      */
@@ -132,6 +138,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Check if widgets z-indexes needs to be shifted. Use on create.
+     *
      * @param index {@link WidgetCustomEntity} Widget z-index.
      * @return True if widgets z-indexes needs to be shifted, else false.
      */
@@ -142,8 +149,9 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
     /**
      * Check if widgets z-indexes needs to be shifted. Use on update.
      * We need to shift widgets only if widget with such z-index has same id, so it is widget update with same z-index.
+     *
      * @param zIndex {@link WidgetCustomEntity} Widget z-index.
-     * @param id {@link WidgetCustomEntity} Widget id.
+     * @param id     {@link WidgetCustomEntity} Widget id.
      * @return True if widgets z-indexes needs to be shifted, else false.
      */
     public boolean isNeedToShift(int zIndex, String id) {
@@ -156,6 +164,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Return z-index for tail position in repository for filter widgets to shift.
+     *
      * @param index z-index to insert in repository.
      * @return z-index shifting to.
      */
@@ -202,6 +211,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Shifts only necessary widgets z-indexes upwards.
+     *
      * @param index new widget z-index.
      */
     public void shiftUpwards(int index) {
@@ -222,6 +232,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to create widget entity via object with all necessary params.
+     *
      * @param createDTO Object with all necessary params to create widget entity.
      * @return widget entity created by constructor params object.
      */
@@ -232,6 +243,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to find widget from repository by unique ID.
+     *
      * @param id {@link WidgetCustomEntity} Widget unique ID.
      * @return {@link WidgetCustomEntity} Widget entity if exists.
      */
@@ -242,6 +254,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to get all widgets in repository.
+     *
      * @return {@link List< WidgetCustomEntity >} All widgets in repository.
      */
     public List<WidgetCustomEntity> findAllEntities() {
@@ -250,6 +263,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to get all widgets in repository by page.
+     *
      * @param page Page of widgets you want to get. Min value is 1.
      * @param size Number of widgets in page. Min value is 1.
      * @return {@link List< WidgetCustomEntity >} Widgets in repository on page.
@@ -268,6 +282,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to get current max z-index of all widgets.
+     *
      * @return {@link WidgetCustomEntity} max z-index.
      */
     public int getMaxIndex() {
@@ -280,6 +295,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to save (upsert) widget in repository with write lock.
+     *
      * @param widgetEntity {@link List< WidgetCustomEntity >} Widget entity to save (upsert).
      */
     @Override
@@ -294,6 +310,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to remove widget by its ID from repository.
+     *
      * @param id {@link List< WidgetCustomEntity >} Widget unique ID.
      * @return True if widget was found and removed successfully, else false.
      */
@@ -321,6 +338,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to get all widgets count.
+     *
      * @return count of all widgets.
      */
     @Override
@@ -330,9 +348,10 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Allow to get all widgets z-indexes suitable for current search index.
+     *
      * @param searchIndex One of four search indexes.
-     * @param filter Filtering value for search index.
-     * @param gte If true, then search only in higher (inclusive) elements, else only lower (inclusive) elements.
+     * @param filter      Filtering value for search index.
+     * @param gte         If true, then search only in higher (inclusive) elements, else only lower (inclusive) elements.
      * @return Set of widgets z-indexes in current search index suitable for current filter.
      */
     private Set<Integer> getSearchIndexSetOfZIndexes(TreeMap<Integer, Set<Integer>> searchIndex, int filter, boolean gte) {

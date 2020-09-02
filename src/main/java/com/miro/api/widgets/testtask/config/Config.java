@@ -5,9 +5,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties("config")
-public class Config{
+public class Config {
 
     private String name;
+
     private String environment;
 
     public String getName() {

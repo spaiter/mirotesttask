@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * Widget service that implements all WidgetService interface contracts.
  */
 @Service
-@ConditionalOnProperty(value="beans.widgetservice.impl", havingValue = "WidgetInternalService", matchIfMissing = true)
+@ConditionalOnProperty(value = "beans.widgetservice.impl", havingValue = "WidgetInternalService", matchIfMissing = true)
 public class WidgetInternalService implements WidgetService<WidgetResponseDTO> {
 
     private final InternalWidgetEntityRepository<WidgetCustomEntity, WidgetCreateDTO, WidgetFilterDTO> widgetsRepository;
@@ -75,7 +75,7 @@ public class WidgetInternalService implements WidgetService<WidgetResponseDTO> {
         long stamp = lock.tryOptimisticRead();
         Optional<WidgetCustomEntity> widget = widgetsRepository.findEntityById(id);
 
-        if(!lock.validate(stamp)) {
+        if (!lock.validate(stamp)) {
             stamp = lock.readLock();
             try {
                 return widgetsRepository.findEntityById(id).map(this::convertWidgetEntityToWidgetResponseDTO);
@@ -129,7 +129,7 @@ public class WidgetInternalService implements WidgetService<WidgetResponseDTO> {
         long stamp = lock.tryOptimisticRead();
         List<WidgetCustomEntity> widgets = widgetsRepository.findAllEntities();
 
-        if(!lock.validate(stamp)) {
+        if (!lock.validate(stamp)) {
             stamp = lock.readLock();
             try {
                 return widgetsRepository
@@ -156,7 +156,7 @@ public class WidgetInternalService implements WidgetService<WidgetResponseDTO> {
 
         PageHelperWrapper<WidgetCustomEntity> widgets = widgetsRepository.findAllEntities(page, size);
 
-        if(!lock.validate(stamp)) {
+        if (!lock.validate(stamp)) {
             stamp = lock.readLock();
             try {
                 widgets = widgetsRepository.findAllEntities(page, size);
@@ -181,6 +181,7 @@ public class WidgetInternalService implements WidgetService<WidgetResponseDTO> {
 
     /**
      * Allow to get filtered widgets with pagination, sorted ascend by z-index.
+     *
      * @param pageRequest {@link Pageable} any object that implements Pageable interface.
      * @param filterDTO   DTO {@link WidgetFilterDTO} with filtering properties.
      * @return {@link Page<WidgetResponseDTO>}
@@ -194,7 +195,7 @@ public class WidgetInternalService implements WidgetService<WidgetResponseDTO> {
 
         PageHelperWrapper<WidgetCustomEntity> widgets = widgetsRepository.getFilteredEntities(page, size, filterDTO);
 
-        if(!lock.validate(stamp)) {
+        if (!lock.validate(stamp)) {
             stamp = lock.readLock();
             try {
                 widgets = widgetsRepository.getFilteredEntities(page, size, filterDTO);

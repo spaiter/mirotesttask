@@ -6,12 +6,14 @@ package com.miro.api.widgets.testtask.repositories;
 public interface ShiftableIntIndexEntityRepository {
     /**
      * Allow to get max entity unique int index.
+     *
      * @return max entity index.
      */
     int getMaxIndex();
 
     /**
      * Check that entities should be shifted by int index. Use on create only.
+     *
      * @param index Entity unique int index.
      * @return true if shifting is necessary, else false.
      */
@@ -19,14 +21,16 @@ public interface ShiftableIntIndexEntityRepository {
 
     /**
      * Check that entities should be shifted by int index. Use on update only.
+     *
      * @param index Entity unique int index.
-     * @param id Entity id.
+     * @param id    Entity id.
      * @return true if shifting is necessary, else false.
      */
     boolean isNeedToShift(int index, String id);
 
     /**
      * Shift entities by int index/
+     *
      * @param index Entity unique int index.
      */
     void shiftUpwards(int index);

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
-@ConditionalOnProperty(value="beans.widgetservice.impl", havingValue = "WidgetSqlService", matchIfMissing = false)
+@ConditionalOnProperty(value = "beans.widgetservice.impl", havingValue = "WidgetSqlService", matchIfMissing = false)
 public class WidgetSqlService implements WidgetService<WidgetResponseDTO> {
 
     private final SqlWidgetEntityRepository widgetsRepository;
