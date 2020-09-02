@@ -44,3 +44,10 @@ To run all tests and get report:
 mvn test jacoco:report
  ```
 Report folder `./target/site/jacoco`.
+
+## TODO
+- move shifting logic from repository to service, because it's a part of business logic.
+- refactor whole app to clean architecture. Examples: https://medium.com/swlh/clean-architecture-java-spring-fea51e26e00, https://medium.com/slalom-build/clean-architecture-with-java-11-f78bba431041
+- refactor entities and dto creation via factories.
+- create a sql query that will return the z-index of the last widget to be offset. (same logic as in my implementation repository right now).
+- fix all checklist errors.
