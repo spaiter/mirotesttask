@@ -11,8 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class WidgetSqlService implements WidgetService<WidgetResponseDTO> {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<WidgetResponseDTO> getWidgetById(String id) {
         return widgetsRepository.findById(id).map(this::convertWidgetEntityToWidgetResponseDTO);
     }
@@ -73,8 +74,8 @@ public class WidgetSqlService implements WidgetService<WidgetResponseDTO> {
             widget.setHeight(updateDTO.getHeight());
             widget.setZIndex(updateDTO.getZIndex());
             widget.markUpdated();
-            if (widgetsRepository.isNeedToShift(widget.getZIndex(), widget.getId())) {
-                widgetsRepository.shiftUpwards(widget.getZIndex());
+            if (widgetsRepository.isNeedToShift(updateDTO.getZIndex(), id)) {
+                widgetsRepository.shiftUpwards(updateDTO.getZIndex());
             }
             widgetsRepository.save(widget);
             return convertWidgetEntityToWidgetResponseDTO(widget);
@@ -90,14 +91,14 @@ public class WidgetSqlService implements WidgetService<WidgetResponseDTO> {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<WidgetResponseDTO> getAllWidgets() {
         return StreamSupport.stream(widgetsRepository.findAll().spliterator(), false)
                 .map(this::convertWidgetEntityToWidgetResponseDTO).collect(Collectors.toList());
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<WidgetResponseDTO> getAllWidgets(Pageable pageRequest) {
         Page<WidgetJpaEntity> widgetJpaEntityPage = widgetsRepository.findAll(pageRequest);
         List<WidgetResponseDTO> responseDTOList = widgetJpaEntityPage.getContent().stream().map(this::convertWidgetEntityToWidgetResponseDTO).collect(Collectors.toList());
@@ -105,7 +106,7 @@ public class WidgetSqlService implements WidgetService<WidgetResponseDTO> {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<WidgetResponseDTO> getFilteredWidgets(Pageable pageRequest, WidgetFilterDTO filterDTO) {
         Page<WidgetJpaEntity> widgetJpaEntityPage = widgetsRepository.getFilteredEntities(
                 filterDTO.getX1(),

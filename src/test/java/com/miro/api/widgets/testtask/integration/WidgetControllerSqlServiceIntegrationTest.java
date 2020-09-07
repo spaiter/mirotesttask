@@ -628,4 +628,71 @@ public class WidgetControllerSqlServiceIntegrationTest {
         assertThat(filteredWidgets.size()).isEqualTo(2);
     }
 
+    @Test
+    public void whenUpdateWidgetWithSameZIndexRequest_thenCorrectResponse() throws Exception {
+        List<WidgetResponseDTO> requests = List.of(
+                new WidgetCreateRequestDTO(1, 1, 1, 1, 1),
+                new WidgetCreateRequestDTO(2, 2, 2, 2, 2)
+        ).stream().map(request -> {
+            try {
+                return objectMapper.writeValueAsString(request);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(json -> {
+            try {
+                return mockMvc.perform(MockMvcRequestBuilders.post("/widgets")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(MockMvcResultMatchers.status().isCreated())
+                        .andReturn();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(response -> {
+            try {
+                return response.getResponse().getContentAsString();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull).map(result -> {
+            try {
+                return objectMapper.readValue(result, WidgetResponseDTO.class);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        WidgetUpdateRequestDTO widgetUpdateRequestDTO = new WidgetUpdateRequestDTO(
+                10,
+                10,
+                2,
+                10,
+                10
+        );
+        String jsonUpdateRequest = objectMapper.writeValueAsString(widgetUpdateRequestDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.put(String.format("/widgets/%s", requests.get(0).getId()))
+                .content(jsonUpdateRequest)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/widgets")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String actualResponseBody = result.getResponse().getContentAsString();
+        List<WidgetResponseDTO> responseDTO = objectMapper.readValue(actualResponseBody, new TypeReference<>() {
+        });
+
+        assertThat(responseDTO.size()).isEqualTo(2);
+        assertThat(responseDTO.get(0).getZIndex()).isEqualTo(2);
+        assertThat(responseDTO.get(1).getZIndex()).isEqualTo(3);
+    }
+
 }

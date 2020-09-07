@@ -29,7 +29,7 @@ public interface SqlWidgetEntityRepository extends PagingAndSortingRepository<Wi
             Pageable pageRequest
     );
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("Update widget w set w.zIndex = w.zIndex + 1 where w.zIndex >= ?1")
     void shiftUpwards(int zIndex);
 
