@@ -7,23 +7,23 @@ import javax.validation.constraints.Positive;
 
 public class WidgetUpdateRequestDTO implements AppLayerDTO {
     @NotNull
-    private final int xCoordinate;
+    private final Integer xCoordinate;
 
     @NotNull
-    private final int yCoordinate;
+    private final Integer yCoordinate;
 
     @NotNull
-    private final int zIndex;
-
-    @NotNull
-    @Positive
-    private final int height;
+    private final Integer zIndex;
 
     @NotNull
     @Positive
-    private final int width;
+    private final Integer height;
 
-    public WidgetUpdateRequestDTO(int xCoordinate, int yCoordinate, int zIndex, int height, int width) {
+    @NotNull
+    @Positive
+    private final Integer width;
+
+    public WidgetUpdateRequestDTO(Integer xCoordinate, Integer yCoordinate, Integer zIndex, Integer height, Integer width) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.zIndex = zIndex;
