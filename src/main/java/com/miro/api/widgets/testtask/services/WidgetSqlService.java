@@ -44,6 +44,9 @@ public class WidgetSqlService implements WidgetService<WidgetResponseDTO> {
     @Transactional
     public WidgetResponseDTO createAndSaveWidget(WidgetCreateDTO createDTO) throws IllegalArgumentException {
         checkWidthAndHeightForNegativeValue(createDTO.getHeight(), createDTO.getWidth());
+        if (createDTO.getZIndex() == null) {
+            createDTO.setZIndex(widgetsRepository.getMaxIndex() + 1);
+        }
         WidgetJpaEntity widgetEntity = new WidgetJpaEntity(createDTO);
         if (widgetsRepository.isNeedToShift(widgetEntity.getZIndex())) {
             widgetsRepository.shiftUpwards(widgetEntity.getZIndex());
