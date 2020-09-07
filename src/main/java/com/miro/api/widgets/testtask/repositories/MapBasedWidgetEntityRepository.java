@@ -164,6 +164,13 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
 
     /**
      * Return z-index for tail position in repository for filter widgets to shift.
+     * It is the z-index where difference between inserting widget z-index and searchable z-index equals size of elements between this z-indexes.
+     *
+     * For example, there are such z-indexes in repository: 1, 2, 3, 4, 5, 10, 11, 20, 21 and we want to insert new widget with z-index 3.
+     * In this case we need to shifts only widgets with z-index 3, 4 and 5. So for this example this method will return 5.
+     *
+     * This method use binary search algorithm with additional logic.
+     *
      *
      * @param index z-index to insert in repository.
      * @return z-index shifting to.
@@ -212,6 +219,8 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
     /**
      * Shifts only necessary widgets z-indexes upwards.
      *
+     * Update widgets z-indexes for widgets where z-indexes greater than insertable index and lower than index returning by getTailToIndex method.
+     *
      * @param index new widget z-index.
      */
     public void shiftUpwards(int index) {
@@ -255,7 +264,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
     /**
      * Allow to get all widgets in repository.
      *
-     * @return {@link List< WidgetCustomEntity >} All widgets in repository.
+     * @return {@link List<WidgetCustomEntity>} All widgets in repository.
      */
     public List<WidgetCustomEntity> findAllEntities() {
         return new ArrayList<>(widgetsStorage.descendingMap().values());
@@ -266,7 +275,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
      *
      * @param page Page of widgets you want to get. Min value is 1.
      * @param size Number of widgets in page. Min value is 1.
-     * @return {@link List< WidgetCustomEntity >} Widgets in repository on page.
+     * @return {@link List<WidgetCustomEntity>} Widgets in repository on page.
      */
     public PageHelperWrapper<WidgetCustomEntity> findAllEntities(int page, int size) {
         List<WidgetCustomEntity> widgets = widgetsStorage
@@ -296,7 +305,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
     /**
      * Allow to save (upsert) widget in repository with write lock.
      *
-     * @param widgetEntity {@link List< WidgetCustomEntity >} Widget entity to save (upsert).
+     * @param widgetEntity {@link List<WidgetCustomEntity>} Widget entity to save (upsert).
      */
     @Override
     public WidgetCustomEntity saveEntity(WidgetCustomEntity widgetEntity) {
@@ -311,7 +320,7 @@ public class MapBasedWidgetEntityRepository implements InternalWidgetEntityRepos
     /**
      * Allow to remove widget by its ID from repository.
      *
-     * @param id {@link List< WidgetCustomEntity >} Widget unique ID.
+     * @param id {@link List<WidgetCustomEntity>} Widget unique ID.
      * @return True if widget was found and removed successfully, else false.
      */
     @Override
