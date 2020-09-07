@@ -104,6 +104,7 @@ public class WidgetInternalService implements WidgetService<WidgetResponseDTO> {
                 if (widgetsRepository.isNeedToShift(updateDTO.getZIndex(), w.getId())) {
                     widgetsRepository.shiftUpwards(updateDTO.getZIndex());
                 }
+                widgetsRepository.deleteEntityById(w.getId());
                 widgetsRepository.saveEntity(widgetEntity);
                 return widgetEntity;
             });
