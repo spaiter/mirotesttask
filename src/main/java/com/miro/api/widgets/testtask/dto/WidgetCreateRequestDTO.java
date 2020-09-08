@@ -7,22 +7,22 @@ import javax.validation.constraints.Positive;
 
 public class WidgetCreateRequestDTO implements AppLayerDTO {
     @NotNull
-    private final int xCoordinate;
+    private final Integer xCoordinate;
 
     @NotNull
-    private final int yCoordinate;
+    private final Integer yCoordinate;
 
     private final Integer zIndex;
 
     @NotNull
     @Positive
-    private final int height;
+    private final Integer height;
 
     @NotNull
     @Positive
-    private final int width;
+    private final Integer width;
 
-    public WidgetCreateRequestDTO(int xCoordinate, int yCoordinate, Integer zIndex, int height, int width) {
+    public WidgetCreateRequestDTO(Integer xCoordinate, Integer yCoordinate, Integer zIndex, Integer height, Integer width) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.zIndex = zIndex;
